@@ -1,0 +1,35 @@
+{
+  "name": "hanoi-local",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hanoi Local - interactive Hanoi travel guide (Group 33 final project)",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "db:init": "node server/db/init.js",
+    "db:seed": "node server/db/seed.js",
+    "db:reset": "node server/db/init.js --fresh && node server/db/seed.js",
+    "db:demo": "node server/db/seed-demo.js",
+    "db:demo-reset": "node server/db/init.js --fresh && node server/db/seed-demo.js",
+    "qa:responsive": "node tests/browser-check.mjs http://localhost:3000/ && node tests/browser-check.mjs http://localhost:3000/food.html && node tests/browser-check.mjs http://localhost:3000/places.html && node tests/browser-check.mjs http://localhost:3000/account.html",
+    "qa:catalogue": "node tests/catalogue-check.mjs",
+    "qa:auth": "node tests/auth-check.mjs",
+    "qa:account": "node tests/account-check.mjs",
+    "qa:data": "node tests/data-check.mjs",
+    "qa:drawers": "node tests/drawers-check.mjs",
+    "qa:a11y": "node tests/a11y-check.mjs",
+    "qa:perf": "node tests/perf-check.mjs",
+    "qa": "npm run qa:responsive && npm run qa:catalogue && npm run qa:auth && npm run qa:account && npm run qa:data && npm run qa:drawers && npm run qa:a11y && npm run qa:perf",
+    "benchmark": "node tests/benchmark.mjs",
+    "assets:webp": "node tests/optimise-images.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "3.0.3",
+    "express": "5.1.0",
+    "express-session": "1.19.0"
+  }
+}

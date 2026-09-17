@@ -241,13 +241,50 @@ Do not start personal features until:
 
 ## 10. Final Definition of Done
 
-- [ ] Every P0 requirement passes.
-- [ ] Five feature groups can be demonstrated.
-- [ ] Database can be recreated from instructions.
-- [ ] Every member has completed one primary task and one review.
-- [ ] No critical/high bug remains.
-- [ ] Demo account and seed data are ready.
-- [ ] Demo completes in under five minutes.
-- [ ] Performance/testing evidence is available.
-- [ ] All members understand auth, Favorites and My Day flow.
+Code and evidence:
+
+- [x] Every P0 requirement passes — Home, Food, Places, Account, API catalogue,
+      search/filter/sort, register/login/logout, per-user Favorites, per-user My
+      Day, responsive layout, and loading/error/empty states are all built and
+      covered by automated checks.
+- [x] Five feature groups can be demonstrated — catalogue and detail, search and
+      filter, authentication, Favorites, My Day.
+- [x] Database can be recreated from instructions — `npm run db:reset` and
+      `npm run db:demo-reset`, verified from a clean checkout on a second path.
+- [x] No critical or high bug remains — 343 automated assertions pass and the
+      browser and server consoles are asserted clean.
+- [x] Demo account and seed data are ready — `demo` and `demo2`, each with
+      Favorites and a My Day plan.
+- [x] Performance and testing evidence is available — see docs/05 sections 2, 4,
+      5 and 6.
+
+Team work still to do (not code):
+
+- [ ] Every member has completed one primary task and one review. The code
+      currently comes from one build pass; split the remaining Phase 4 items
+      (photography, slides, rehearsal) so every member owns something and
+      reviews something.
+- [ ] Demo completes in under five minutes — rehearse three times with a timer.
+- [ ] All members understand the auth, Favorites and My Day flow — walk through
+      docs/05 section 9 together; the answers are written out there.
+
+### Phase 4 status
+
+| Task | Status |
+|---|---|
+| QA-01 API test checklist | Done, as `qa:auth` and `qa:data` |
+| QA-02 end-to-end demo flow | Script written in docs/05 section 8, not yet rehearsed |
+| QA-03 responsive pass | Done, `qa:responsive`, 4 pages × 4 widths |
+| QA-04 keyboard and accessibility pass | Done, `qa:a11y`, 78 checks |
+| QA-05 console pass | Done, asserted on every page in every browser suite |
+| QA-06 bug triage list | Not needed: no open bugs. Everything found was fixed in the same pass |
+| PERF-01 convert images to WebP/AVIF | Tooling done (`npm run assets:webp`), photographs outstanding |
+| PERF-02 lazy-load below the fold | Done, asserted against real element positions |
+| PERF-03 reserve image space | Done, CLS under 0.1 on Home and Food |
+| PERF-04 API benchmark | Done, docs/05 section 6 |
+| DOC-01 setup README | Done and verified from a clean checkout |
+| DOC-02 architecture slide | Outstanding |
+| DOC-03 feature/demo slide | Outstanding |
+| DOC-04 results slide | Outstanding, numbers ready in docs/05 |
+| DOC-05 Q&A sheet | Done, docs/05 section 9 with written answers |
 

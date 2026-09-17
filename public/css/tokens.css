@@ -1,0 +1,154 @@
+/* ==========================================================================
+   Hanoi Local - design tokens (SET-03)
+   Single source of truth for colour, type, spacing, radius and motion.
+   Values come from docs/01-design-style.md. Do not hard-code these anywhere
+   else; page CSS must reference the variables.
+   ========================================================================== */
+
+:root {
+  /* --- Colour: core palette (Design Style section 4) --------------------- */
+  --color-paper: #fcfcf8;
+  --color-surface: #ffffff;
+  --color-ink: #111111;
+  --color-muted: #5e625f;
+  --color-line: #d9ddd8;
+  --color-red: #d82c35;
+  --color-blue: #075fd8;
+  --color-jade: #326b50;
+  --color-success: #1e7a46;
+  --color-error: #b42318;
+
+  /* Derived shades. Kept few on purpose: no gradients, no glass effects. */
+  --color-ink-soft: #2b2d2b;
+  --color-red-dark: #b32029;
+  --color-blue-dark: #054aa8;
+  --color-paper-sunken: #f4f4ee;
+  --color-overlay: rgb(17 17 17 / 55%);
+
+  /* --- Semantic roles --------------------------------------------------- */
+  --bg-page: var(--color-paper);
+  --bg-raised: var(--color-surface);
+  --bg-sunken: var(--color-paper-sunken);
+  --text-primary: var(--color-ink);
+  --text-secondary: var(--color-muted);
+  --text-on-dark: var(--color-paper);
+  --border-default: var(--color-line);
+  --accent-brand: var(--color-red);
+  --accent-action: var(--color-blue);
+  --accent-meta: var(--color-jade);
+  --focus-ring: var(--color-blue);
+
+  /* --- Typography (Design Style section 5) ------------------------------ */
+  --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Manrope', 'Helvetica Neue', Arial, sans-serif;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-black: 800;
+
+  /* Fluid where the spec asks for it, fixed where the spec fixes it. */
+  --text-hero: clamp(3.2rem, 7vw, 7rem);
+  --text-section: clamp(2rem, 4vw, 3rem);
+  --text-card-title: clamp(1.25rem, 1.6vw, 1.5rem);
+  --text-body-lg: clamp(1.05rem, 1.2vw, 1.25rem);
+  --text-body: 1rem;
+  --text-label: 0.875rem; /* never smaller than 14px */
+  --text-meta: 0.75rem; /* secondary information only */
+
+  --leading-hero: 0.94;
+  --leading-tight: 1.1;
+  --leading-snug: 1.35;
+  --leading-body: 1.6;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.08em; /* short eyebrow labels only */
+
+  --measure-body: 65ch;
+  --measure-narrow: 45ch;
+
+  /* --- Spacing scale: 8 12 16 24 32 48 64 96 128 ------------------------ */
+  --space-1: 0.5rem; /* 8 */
+  --space-2: 0.75rem; /* 12 */
+  --space-3: 1rem; /* 16 */
+  --space-4: 1.5rem; /* 24 */
+  --space-5: 2rem; /* 32 */
+  --space-6: 3rem; /* 48 */
+  --space-7: 4rem; /* 64 */
+  --space-8: 6rem; /* 96 */
+  --space-9: 8rem; /* 128 */
+
+  /* --- Layout ----------------------------------------------------------- */
+  --container-max: 1440px;
+  --container-pad: 1.25rem; /* mobile 20px, raised at breakpoints below */
+  --utility-bar-height: 2.25rem; /* 36px minimum */
+  --header-height: 5.25rem; /* 84px, grows to 92px on wide desktop */
+  --hero-min-height: 42.5rem; /* 680px, not tied to 100vh */
+
+  /* --- Radius and borders ---------------------------------------------- */
+  --radius-none: 0;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem; /* 16px ceiling from the spec */
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --border-strong: 2px;
+
+  /* --- Elevation: minimal by design, borders do most of the work ------- */
+  --shadow-none: none;
+  --shadow-card: 0 1px 2px rgb(17 17 17 / 5%);
+  --shadow-raised: 0 8px 24px rgb(17 17 17 / 10%);
+  --shadow-overlay: 0 16px 48px rgb(17 17 17 / 18%);
+
+  /* --- Controls (Design Style section 8) ------------------------------- */
+  --control-height: 3rem; /* 48px minimum */
+  --touch-target: 2.75rem; /* 44px minimum */
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+
+  /* --- Motion (Design Style section 9) --------------------------------- */
+  --duration-underline: 150ms;
+  --duration-control: 200ms;
+  --duration-image: 240ms;
+  --duration-overlay: 260ms;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* --- Aspect ratios (Design Style section 10) ------------------------- */
+  --ratio-card: 4 / 3;
+  --ratio-tile: 16 / 9;
+  --ratio-portrait: 3 / 4;
+
+  /* --- Z-index ---------------------------------------------------------- */
+  --z-header: 100;
+  --z-overlay: 200;
+  --z-drawer: 210;
+  --z-modal: 220;
+  --z-toast: 300;
+}
+
+/* Container padding grows with the viewport: 20 -> 32 -> 64px. */
+@media (min-width: 768px) {
+  :root {
+    --container-pad: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --container-pad: 4rem;
+    --header-height: 5.75rem;
+  }
+}
+
+/* Honour the OS setting instead of animating anyway (section 9). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-underline: 1ms;
+    --duration-control: 1ms;
+    --duration-image: 1ms;
+    --duration-overlay: 1ms;
+  }
+}
