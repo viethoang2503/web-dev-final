@@ -6,3 +6,13 @@ node_modules/
 *.sqlite-shm
 .DS_Store
 .codegraph/
+
+# Local project documentation and design references (keep the root README).
+/docs/
+*.doc
+*.docx
+*.pdf
+
+# Generated browser reports and temporary output.
+/test-results/
+/coverage/

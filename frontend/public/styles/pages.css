@@ -1,0 +1,252 @@
+/* Hanoi Local: desktop editorial guide.
+   Reference: docs/assets/hanoi-local-landing-mockup.png.
+   Layout only: no animation library, no mobile redesign, no data-flow changes.
+   Photo corners are square; interactive controls keep the shared small radius. */
+
+.desktop-guide {
+  --container-max: 1600px;
+  --container-pad: clamp(32px, 4.8vw, 80px);
+  --text-section: clamp(32px, 3.1vw, 48px);
+  --text-body-lg: clamp(18px, 1.5vw, 23px);
+  --guide-hero-type: clamp(60px, 5.8vw, 92px);
+  --guide-cover-type: clamp(60px, 6.4vw, 100px);
+  --guide-brand-type: clamp(36px, 3.6vw, 56px);
+  --guide-photo-height: clamp(360px, 30vw, 480px);
+  --guide-caption-bg: rgb(17 17 17 / 88%);
+  min-width: 1000px; /* Fits a 1024px desktop including its scrollbar. */
+  background: var(--color-surface);
+}
+
+.desktop-guide .site-header {
+  background: var(--color-surface);
+  border-block-end: 0;
+}
+.desktop-guide .utility-bar {
+  background: var(--color-surface);
+  font-size: var(--text-label);
+}
+.desktop-guide .site-header__inner { min-height: 84px; gap: var(--space-4); }
+.desktop-guide .brand { font-size: var(--guide-brand-type); letter-spacing: -0.055em; line-height: 1; }
+.desktop-guide .brand__local { margin-inline-start: 0.12em; }
+.desktop-guide .site-nav { position: static; padding: 0; border: 0; box-shadow: none; }
+.desktop-guide .site-nav__list { flex-direction: row; gap: clamp(8px, 1.7vw, 28px); }
+.desktop-guide .site-nav__link { font-size: clamp(16px, 1.2vw, 18px); min-height: 52px; }
+.desktop-guide .site-nav__link[aria-current='page'] { color: var(--color-red-dark); }
+.desktop-guide .site-header__actions .button { min-height: 48px; padding-inline: var(--space-4); font-size: 16px; }
+.desktop-guide .site-header__actions > .icon-button { color: var(--accent-brand); }
+.desktop-guide .site-header__actions > .icon-button svg { width: 28px; height: 28px; }
+.desktop-guide .account-chip__name { max-width: 6rem; }
+.desktop-guide .button { white-space: nowrap; gap: var(--space-4); }
+.desktop-guide .button > span[aria-hidden] { font-size: 1.4em; line-height: 1; }
+.desktop-guide :is([id$="-guide"], [id$="-grid"], #planner) { scroll-margin-top: 144px; }
+
+/* Hero: the whole composition, including the category heading, fits a laptop. */
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+  align-items: center;
+  gap: var(--space-5);
+  padding-block: var(--space-3) var(--space-5);
+}
+.home-hero__copy { min-width: 0; }
+.home-hero .eyebrow { margin-block-end: var(--space-4); font-size: 14px; letter-spacing: 0.14em; }
+.home-hero h1 { font-size: var(--guide-hero-type); line-height: 1.02; letter-spacing: -0.055em; white-space: nowrap; }
+.home-hero h1 > span { color: var(--accent-brand); }
+.home-hero__lede { margin-block: var(--space-4) var(--space-5); font-size: var(--text-body-lg); line-height: 1.5; }
+.home-hero__actions { display: flex; gap: var(--space-3); }
+.home-hero__actions .button { min-height: 58px; padding-inline: var(--space-4); font-size: clamp(16px, 1.35vw, 20px); }
+
+/* Each photograph owns a clear part of the grid. Only the lower edges overlap. */
+.home-collage {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: repeat(12, minmax(0, 1fr));
+  height: var(--guide-photo-height);
+  position: relative;
+  isolation: isolate;
+}
+.home-collage::before,
+.home-collage::after { content: ''; position: absolute; background: var(--accent-brand); z-index: -1; }
+.home-collage::before { top: 0; right: 4%; width: 32%; height: 25%; }
+.home-collage::after { left: -3%; bottom: 23%; width: 22%; height: 24%; }
+.home-collage figure { overflow: hidden; border: 4px solid var(--color-surface); min-width: 0; min-height: 0; }
+.home-collage img { width: 100%; height: 100%; object-fit: cover; }
+.home-collage__lake { grid-area: 1 / 1 / 9 / 8; }
+.home-collage__lake img { object-position: 54% center; }
+.home-collage__street { grid-area: 2 / 8 / 8 / 13; }
+.home-collage__street img { object-position: center 66%; }
+.home-collage__food { grid-area: 8 / 2 / 13 / 8; }
+.home-collage__food img { object-position: center 55%; }
+.home-collage__heritage { grid-area: 8 / 8 / 13 / 13; margin-top: var(--space-2); }
+
+/* Direct entry points immediately after the hero, as in the supplied mockup. */
+.section__head { display: grid; gap: var(--space-2); margin-block-end: var(--space-4); }
+.section__head--row { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
+.section__head p { margin-block-start: var(--space-2); color: var(--text-secondary); }
+.home-interests { padding-block: 0 var(--space-6); }
+.home-interests h2 { font-size: clamp(30px, 3.1vw, 46px); letter-spacing: -0.04em; }
+.interest-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+.interest { position: relative; display: block; overflow: hidden; aspect-ratio: 1.9; text-decoration: none; }
+.interest img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--duration-image) var(--ease-out); }
+.interest__label {
+  position: absolute; left: 0; bottom: 0;
+  display: flex; align-items: center; gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-surface); background: var(--guide-caption-bg);
+  font-family: var(--font-display); font-size: clamp(20px, 1.7vw, 26px); font-weight: var(--weight-bold);
+}
+.interest:hover img { transform: scale(1.035); }
+.interest:hover .interest__label { background: var(--color-ink); }
+
+/* Open image-led cards: metadata stays readable, favourite buttons still work. */
+.guide-section { padding-block: var(--space-6); }
+.desktop-guide .card-grid { align-items: start; gap: var(--space-6) var(--space-4); }
+.desktop-guide .card { border: 0; border-radius: 0; box-shadow: none; background: transparent; overflow: visible; }
+.desktop-guide .card:hover { border-color: transparent; }
+.desktop-guide .card__media { border-radius: 0; }
+.desktop-guide .card__body { padding: var(--space-3) 0 0; gap: var(--space-1); }
+.desktop-guide .card__title { font-size: clamp(22px, 2vw, 30px); }
+.desktop-guide .card__summary { max-width: 48ch; }
+.desktop-guide .skeleton-card { border: 0; border-radius: 0; box-shadow: none; }
+.desktop-guide .skeleton-card__body { padding-inline: 0; }
+.home-food-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.home-food-grid .card__media { aspect-ratio: 4 / 5; }
+.home-food-grid .card:nth-child(even) { margin-top: var(--space-5); }
+.home-places-grid { grid-template-columns: 1.3fr 1fr 1fr; }
+.home-places-grid .card:first-child .card__media { aspect-ratio: 1.25; }
+.home-places-grid .card:not(:first-child) { margin-top: var(--space-6); }
+
+/* An unboxed planner, not a second promotional photo wall. */
+.day-plan { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); padding-block: var(--space-7); }
+.day-plan__copy { display: grid; gap: var(--space-4); justify-items: start; }
+.day-plan h2 { font-size: clamp(40px, 4.2vw, 64px); line-height: 1.05; }
+.day-plan__copy > p:not(.eyebrow) { max-width: 42ch; color: var(--text-secondary); }
+.day-plan__slots { display: grid; align-content: center; }
+.day-plan__slots li { padding-block: var(--space-4); border-block-start: 1px solid var(--border-default); }
+.day-plan__slots p { margin-block-start: var(--space-1); color: var(--text-secondary); }
+.day-plan__slots h3 { color: var(--accent-meta); }
+
+/* Catalogue covers: a magazine opening before the working search/filter UI. */
+.catalogue-cover { display: grid; align-items: center; gap: var(--space-5); padding-block: var(--space-5) var(--space-7); }
+.catalogue-cover--food { grid-template-columns: 1fr 1.05fr 0.65fr; }
+.catalogue-cover__copy { display: grid; justify-items: start; gap: var(--space-4); }
+.catalogue-cover h1 { font-size: var(--guide-cover-type); letter-spacing: -0.055em; line-height: 1.02; }
+.catalogue-cover h1 span { color: var(--accent-brand); }
+.catalogue-cover__copy > p:not(.eyebrow) { max-width: 33ch; font-size: var(--text-body-lg); color: var(--text-secondary); }
+.catalogue-cover__copy .button { margin-block-start: var(--space-2); min-height: 54px; }
+.catalogue-cover__photo { position: relative; align-self: start; }
+.catalogue-cover__photo::before { content: ''; position: absolute; top: -12px; right: -12px; width: 35%; height: 25%; background: var(--accent-brand); z-index: -1; }
+.catalogue-cover__photo > img { width: 100%; height: 480px; object-fit: cover; }
+.catalogue-cover figcaption { padding-block-start: var(--space-3); color: var(--text-secondary); font-size: 16px; }
+.catalogue-cover figcaption strong { display: block; color: var(--text-primary); }
+.catalogue-cover__aside { padding-inline-start: var(--space-4); border-inline-start: 1px solid var(--border-default); }
+.catalogue-cover__aside img { width: 100%; aspect-ratio: 1.1; object-fit: cover; margin-block-end: var(--space-4); }
+.catalogue-cover__aside h2 { font-size: clamp(28px, 2.5vw, 40px); margin-block-end: var(--space-3); }
+.catalogue-cover__aside p { color: var(--text-secondary); }
+.catalogue-cover__aside .button { margin-block-start: var(--space-3); padding-inline: 0; white-space: normal; text-align: left; }
+.catalogue-cover--places { grid-template-columns: 1fr 1.2fr; position: relative; padding-block-end: var(--space-6); }
+.catalogue-cover--places h1 { font-size: clamp(60px, 5.7vw, 88px); white-space: nowrap; }
+.catalogue-cover--places .catalogue-cover__photo { grid-column: 2; grid-row: 1 / 3; align-self: stretch; }
+.catalogue-cover--places .catalogue-cover__photo img { height: 510px; object-position: center; }
+.catalogue-cover--places .catalogue-cover__aside { display: grid; grid-template-columns: 140px 1fr; column-gap: var(--space-4); border: 0; padding: 0; margin-top: var(--space-3); }
+.catalogue-cover--places .catalogue-cover__aside img { grid-row: 1 / 3; height: 130px; margin: 0; }
+.catalogue-cover--places .catalogue-cover__aside h2 { font-size: 26px; margin: 0 0 var(--space-1); }
+.catalogue-cover--places .catalogue-cover__aside h2 br { display: none; }
+.catalogue-heading { padding-block: var(--space-4); border-block-start: 1px solid var(--border-default); }
+.catalogue-heading p { margin-top: var(--space-2); color: var(--text-secondary); }
+
+.toolbar { display: grid; gap: var(--space-4); margin-bottom: var(--space-6); padding-block: var(--space-4); }
+.toolbar__row { display: grid; gap: var(--space-3); }
+.toolbar__row--filters { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+main[data-kind='food'] .toolbar__row--filters { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.toolbar__results { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); border-block-end: 1px solid var(--border-default); padding-bottom: var(--space-3); }
+.toolbar__count { font-weight: var(--weight-semibold); }
+main[data-kind] > .card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); padding-bottom: var(--space-6); }
+main[data-kind] .card__media { aspect-ratio: 4 / 3; }
+main[data-kind] .card:nth-child(6n + 1) { grid-column: span 2; }
+main[data-kind] .card:nth-child(6n + 1) .card__media { aspect-ratio: 2.2; }
+main[data-kind] .card:nth-child(6n + 2) { margin-top: var(--space-5); }
+main[data-kind='place'] .card:nth-child(6n + 1) { grid-column: auto; }
+main[data-kind='place'] .card:nth-child(6n + 1) .card__media { aspect-ratio: 4 / 3; }
+main[data-kind='place'] .card:nth-child(6n + 2) { grid-column: span 2; margin-top: 0; }
+main[data-kind='place'] .card:nth-child(6n + 2) .card__media { aspect-ratio: 2.2; }
+
+/* The supplied mockup is light with a dark utility footer. */
+.desktop-guide .site-footer { margin-top: var(--space-6); }
+.desktop-guide .site-footer .brand { font-size: 36px; }
+@media (prefers-reduced-motion: reduce) {
+  .interest img { transition: none; }
+}
+
+/* Account form layout retained from the existing implementation. */
+.account {
+  padding-block-end: var(--space-7);
+}
+
+.account__intro {
+  display: grid;
+  gap: var(--space-2);
+  padding-block: var(--space-5) var(--space-4);
+}
+
+.account__forms {
+  display: grid;
+  align-items: start;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
+}
+
+.account__forms[hidden] {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .account__forms {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+}
+
+.account__card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background-color: var(--bg-raised);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.account__card h2 {
+  font-size: var(--text-card-title);
+}
+
+.account__form {
+  display: grid;
+  gap: var(--space-3);
+  margin-block-start: var(--space-1);
+}
+
+.account__signed-in {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background-color: var(--bg-sunken);
+  border: var(--border-width) solid var(--border-default);
+  border-inline-start: var(--border-strong) solid var(--color-success);
+  border-radius: var(--radius-md);
+}
+
+.account__signed-in[hidden] {
+  display: none;
+}
+
+.account__signed-in h2 {
+  font-size: var(--text-card-title);
+}
+
+.account__signed-in-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block-start: var(--space-1);
+}
