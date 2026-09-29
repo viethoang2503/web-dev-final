@@ -1,0 +1,45 @@
+/* Thành phần chỉ dùng ở Home. Các trang danh mục dùng guide.css. */
+.desktop-guide .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-height);
+  padding: 10px var(--space-4);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  font-weight: var(--weight-bold);
+  text-decoration: none;
+}
+.desktop-guide .button--primary { color: white; background: var(--accent-action); border-color: var(--accent-action); }
+.desktop-guide .button--primary:hover { color: white; background: var(--color-blue-dark); }
+.desktop-guide .button--secondary { color: var(--text-primary); background: white; border-color: var(--text-primary); }
+.desktop-guide .button--secondary:hover { background: var(--bg-sunken); }
+.desktop-guide .button--text { color: var(--accent-action); text-decoration: underline; }
+
+.desktop-guide .site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--border-default);
+}
+.desktop-guide .utility-bar { border-bottom: 1px solid var(--border-default); font-size: var(--text-meta); }
+.desktop-guide .utility-bar__inner { display: flex; align-items: center; min-height: var(--utility-bar-height); }
+.desktop-guide .site-header__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: var(--header-height); }
+.desktop-guide .brand { display: inline-flex; align-items: baseline; font-family: var(--font-display); font-weight: 800; letter-spacing: -0.04em; white-space: nowrap; text-decoration: none; }
+.desktop-guide .brand__hanoi { color: var(--accent-brand); }
+.desktop-guide .brand__local { color: var(--text-primary); margin-left: 0.12em; }
+.desktop-guide .site-nav__list { display: flex; gap: clamp(10px, 2vw, 30px); list-style: none; padding: 0; margin: 0; }
+.desktop-guide .site-nav__link { display: inline-flex; align-items: center; min-height: 48px; color: var(--text-primary); font-weight: 700; text-decoration: none; white-space: nowrap; }
+.desktop-guide .site-nav__link:hover { color: var(--accent-brand); }
+.desktop-guide .site-nav__link[aria-current='page'] { color: var(--accent-brand); border-bottom: 2px solid var(--accent-brand); }
+.desktop-guide .card-grid { display: grid; }
+
+.desktop-guide .site-footer { margin-top: var(--space-7); padding: var(--space-6) 0; color: var(--text-on-dark); background: var(--color-ink); }
+.desktop-guide .site-footer__inner { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: var(--space-5); }
+.desktop-guide .site-footer__summary { max-width: var(--measure-narrow); color: var(--color-line); }
+.desktop-guide .site-footer__heading { margin-bottom: var(--space-2); font-size: var(--text-label); font-weight: 700; text-transform: uppercase; }
+.desktop-guide .site-footer__list { display: grid; gap: var(--space-1); font-size: var(--text-label); list-style: none; padding: 0; }
+.desktop-guide .site-footer a { color: var(--color-paper); }
+.desktop-guide .site-footer__credits { margin-top: var(--space-5); padding-top: var(--space-3); border-top: 1px solid rgb(252 252 248 / 20%); color: var(--color-line); font-size: var(--text-meta); }

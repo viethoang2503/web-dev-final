@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>See & do — Hanoi Local</title>
+  <meta name="description" content="Find Hanoi places with visit length, admission and Google Maps links." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles/fonts.css" />
+  <link rel="stylesheet" href="/styles/tokens.css" />
+  <link rel="stylesheet" href="/styles/base.css" />
+  <link rel="stylesheet" href="/styles/guide.css" />
+</head>
+<body class="guide-page">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+      <div class="utility-bar"><div class="container utility-bar__inner">Hanoi travel guide</div></div>
+      <div class="container site-header__inner">
+        <a class="brand" href="/"><span class="brand__hanoi">Hanoi</span><span class="brand__local">Local</span></a>
+        <nav class="site-nav" aria-label="Main">
+          <ul class="site-nav__list">
+            <li><a class="site-nav__link" href="/">Home</a></li>
+            <li><a class="site-nav__link" href="/food.html">Eat &amp; drink</a></li>
+            <li><a class="site-nav__link" href="/places.html" aria-current="page">See &amp; do</a></li>
+            <li><a class="site-nav__link" href="/plan.html">Plan your day</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+<main id="main" class="container">
+  <section class="guide-intro guide-intro--places">
+    <div>
+      <p class="eyebrow">See &amp; do</p>
+      <h1>Make time for Hanoi.</h1>
+      <p>Choose a lake, temple or old street. See how long to spend, then add it to your plan.</p>
+    </div>
+    <img src="/uploads/quoc-tu-giam.jpg" alt="Temple of Literature in Hanoi" width="1200" height="900" />
+  </section>
+  <div class="guide-controls guide-controls--single">
+    <label>Find a place<input id="places-search" class="input" type="search" placeholder="Lake, temple, museum..." /></label>
+  </div>
+  <p id="places-count" class="guide-count" role="status">Loading places...</p>
+  <div id="places-list" class="places-list"></div>
+</main>
+<footer class="guide-footer"><div class="container"><strong>Hanoi Local</strong><p>Discover food, see the city and plan your days in Hanoi.</p></div></footer>
+<script type="module" src="/scripts/pages/places.page.js"></script>
+</body></html>

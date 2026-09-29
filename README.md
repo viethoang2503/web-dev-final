@@ -1,12 +1,16 @@
 # Hanoi Local
 
-A Hanoi city guide built with HTML, CSS and vanilla JavaScript, served by
-Express with SQLite. Frontend and API share one origin; no frontend build step
-or separate dependency installation is required.
+Website hướng dẫn khám phá Hà Nội cho bài thuyết trình 5 phút. Ba phần chính:
 
-## Quick start
+1. **Eat & drink:** xem 10 món; mỗi món có ít nhất 2 quán cụ thể.
+2. **See & do:** tìm điểm tham quan, xem thời gian tham khảo và mở Google Maps.
+3. **Plan your day:** chọn ngày bắt đầu, tối đa 3 ngày, chọn mốc xuất phát và dùng một trong 3 tour mẫu hoặc tự thêm điểm dừng.
 
-Requires Node.js 22.5 or newer.
+Không cần tài khoản. Món yêu thích và lịch nằm trong `localStorage` của trình duyệt hiện tại, nên sẽ không tự đồng bộ sang máy khác.
+
+## Chạy local
+
+Cần Node.js 22.5+.
 
 ```sh
 npm ci
@@ -15,68 +19,42 @@ npm run db:seed
 npm start
 ```
 
-Open http://localhost:3000. For watch mode, run `npm run dev`.
-Optionally copy `.env.example` to `.env`. Set a private `SESSION_SECRET`
-before deploying. Relative `DATABASE_PATH` values resolve from this directory.
+Mở [http://localhost:3000](http://localhost:3000). Dùng `npm run dev` khi muốn server tự khởi động lại sau khi sửa backend.
 
-## Project structure
+`db:init` chỉ tạo bảng còn thiếu; `db:seed` cập nhật catalogue bằng upsert. Không cần chạy `db:reset` trên máy đã có dữ liệu. File SQLite mặc định là `source/backend/data/hanoi-local.sqlite`, nằm ngoài Git. Nếu có `.env` cũ, sửa `DATABASE_PATH` theo đường dẫn mới.
+
+## Cấu trúc
+
+Xem [source/README.md](source/README.md) để biết vai trò từng thư mục.
 
 ```text
-frontend/public/
-  index.html, food.html, places.html, account.html
-  styles/                 Shared CSS and page layouts
-  scripts/
-    pages/                Page entry points (*.page.js)
-    components/           Cards, dialogs and site layout
-    features/             Favorites and itinerary interactions
-    services/             API client and authentication
-    utils/                Catalogue filter state
-  assets/                 Fonts, icons and optimized images
-  uploads/                User-supplied photographs
-backend/
-  src/
-    server.js             Express entry point
-    config/               Environment and path configuration
-    routes/               API endpoints (*.routes.js)
-    middleware/           Request middleware (*.middleware.js)
-    services/             Business logic (*.service.js)
-    database/             Schema, connection, seed and session store
-    utils/                HTTP responses and API errors
-  data/                   Local SQLite database (ignored by Git)
-tests/
-  helpers/                Shared browser test utilities
-  *.test.mjs              Integration and browser tests
-scripts/                  Asset optimization and API benchmarking
-docs/                     Local documentation and mockups (ignored by Git)
+source/
+  frontend/public/      HTML, CSS, JavaScript, ảnh
+  backend/src/          Express API và SQLite
+  backend/data/         Database local (không commit)
+tests/                  Kiểm tra luồng demo
+scripts/                Benchmark và tối ưu ảnh
+docs/                   Tài liệu nội bộ, bị Git bỏ qua
 ```
 
-Use lowercase kebab-case, with role suffixes where they add clarity. Keep HTML
-page names and public routes stable. Root npm scripts are the supported entry
-points for development, tests and database tasks.
+Trình duyệt gọi `GET /api/spots` để lấy 10 món và 10 địa điểm. Quán của từng món được lưu trong `source/backend/src/data/food-venues.js`. Mốc và tọa độ làm tròn nằm trong `source/frontend/public/scripts/shared/guide.js`.
 
-## Database
+## Cách hiểu “quán gần”
 
-- `npm run db:init`: apply the schema without deleting existing data.
-- `npm run db:seed`: upsert the catalogue without deleting user data.
-- `npm run db:demo`: rebuild the two presentation accounts.
-- `npm run db:reset` / `db:demo-reset`: **destructive**, local demo use only.
-  Stop the server first.
+Sau khi khách chọn mốc xuất phát, web tính **khoảng cách đường chim bay ước tính** đến các quán và xếp quán gần lên trước. Đây chỉ là thứ tự gợi ý. Nút **Directions** mở Google Maps để xem quãng đường đi bộ thực tế. Không cần API key để tạo Maps URL.
 
-The default database is `backend/data/hanoi-local.sqlite`. If migrating an
-existing checkout, update any custom `.env` that still points to `server/db/`.
+Lịch tự xếp giờ theo ba buổi: sáng từ 08:00, chiều từ 12:00, tối từ 18:00. Mỗi điểm có thời gian ở lại và khoảng đệm 15 hoặc 30 phút giữa các điểm tùy quận. Giờ mở cửa của quán cần kiểm tra lại trên Maps; thời gian và vị trí trong web không phải dữ liệu định tuyến thời gian thực.
 
-## Verification
+## Kiểm tra
 
-Run the server before running `npm run qa:catalogue`, `qa:auth`, `qa:data`,
-`qa:account`, `qa:drawers`, `qa:a11y` or `qa:perf`.
-Run `npm run qa:structure` without a server to validate imports, static assets
-and npm script paths after moving or renaming files.
-Browser tests require Chrome or Chromium. `npm run qa` runs the complete suite.
-Home, Food and Places intentionally target desktop: legacy 375px assertions
-in `qa:responsive` and `qa:account` are outside the current UI brief.
+Chạy server trước rồi chạy `npm run qa`. Lệnh này kiểm tra đường dẫn source và luồng Home → món/quán → tour → lịch 3 ngày bằng Chrome. `npm run benchmark` chỉ đo các API GET trên máy local.
 
-- `npm run benchmark`: API benchmark.
-- `npm run assets:webp -- <source-directory>`: optimize image assets.
+Home giữ bố cục desktop theo mockup. Food, Places và Plan được làm gọn để demo nhanh. Tài liệu và mockup của nhóm còn trên máy trong `docs/`, không được đẩy lên Git.
 
-Detailed course notes, design references and test notes remain locally in
-`docs/`. They are not included in a fresh clone.
+## Luồng demo 5 phút
+
+1. **0:00-0:40:** Home: giới thiệu Hà Nội và ba tour gợi ý.
+2. **0:40-1:50:** Eat & drink: tìm phở, đổi mốc xuất phát, so hai quán và chỉ vào nút Directions. Lưu món vào Favorites trên máy.
+3. **1:50-2:30:** See & do: tìm Temple of Literature, xem thời gian tham quan và nút Add to plan.
+4. **2:30-4:20:** Plan your day: chọn ngày bắt đầu và hai ngày, dùng một tour cho ngày 1, thêm món/địa điểm vào ngày 2, đổi quán và xem giờ dự kiến.
+5. **4:20-5:00:** Tải lại trang để chứng minh lịch còn; giải thích khoảng cách là ước tính, Google Maps hiển thị đường đi thực tế.

@@ -4,7 +4,7 @@
  *   node scripts/optimize-images.mjs <source-folder> [--dry-run]
  *
  * Takes the original JPG/PNG photos, writes WebP versions into the right
- * folders under frontend/public/assets/images/, and prints a before/after table ready to
+ * folders under source/frontend/public/assets/images/, and prints a before/after table ready to
  * paste into docs/05.
  *
  * Uses `sips`, which ships with macOS, so there is nothing to install. If
@@ -12,7 +12,7 @@
  *
  * Naming: the output file name is the input file name with a .webp extension,
  * so a source file named food-pho-bo.jpg becomes
- * frontend/public/assets/images/spots/food-pho-bo.webp and is picked up automatically by
+ * source/frontend/public/assets/images/spots/food-pho-bo.webp and is picked up automatically by
  * the seed data. Files are routed by their prefix:
  *
  *   food-*, place-*  -> assets/images/spots/
@@ -25,7 +25,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const imagesRoot = path.join(projectRoot, 'frontend', 'public', 'assets', 'images');
+const imagesRoot = path.join(projectRoot, 'source', 'frontend', 'public', 'assets', 'images');
 
 const args = process.argv.slice(2);
 const sourceDir = args.find((arg) => !arg.startsWith('--'));
@@ -67,7 +67,7 @@ const hasCwebp = (() => {
  * cwebp writes WebP. macOS `sips` can read WebP but not write it, so without
  * cwebp the script writes AVIF, which sips does support and which is usually
  * smaller anyway. Either is fine: the app references images without an
- * extension and backend/src/middleware/image-resolver.middleware.js serves whichever exists.
+ * extension and source/backend/src/middleware/image-resolver.middleware.js serves whichever exists.
  */
 const requested = args.find((arg) => arg.startsWith('--format='))?.split('=')[1];
 const format = requested ?? (hasCwebp ? 'webp' : 'avif');
@@ -185,5 +185,5 @@ if (skipped.length) {
   console.log('Rename them to food-*, place-*, hero-* or tile-* and run again.');
 }
 
-console.log(`\n${dryRun ? 'Dry run: nothing was written.' : `Wrote ${rows.length} .${format} file(s) into frontend/public/assets/images/.`}`);
+console.log(`\n${dryRun ? 'Dry run: nothing was written.' : `Wrote ${rows.length} .${format} file(s) into source/frontend/public/assets/images/.`}`);
 console.log('Paste the table above into docs/05-testing-and-scoring.md section 5.');

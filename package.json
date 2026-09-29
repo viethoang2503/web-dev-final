@@ -8,29 +8,18 @@
     "node": ">=22.5.0"
   },
   "scripts": {
-    "start": "node backend/src/server.js",
-    "dev": "node --watch backend/src/server.js",
-    "db:init": "node backend/src/database/initialize.js",
-    "db:seed": "node backend/src/database/seed.js",
-    "db:reset": "node backend/src/database/initialize.js --fresh && node backend/src/database/seed.js",
-    "db:demo": "node backend/src/database/seed-demo.js",
-    "db:demo-reset": "node backend/src/database/initialize.js --fresh && node backend/src/database/seed-demo.js",
+    "start": "node source/backend/src/server.js",
+    "dev": "node --watch source/backend/src/server.js",
+    "db:init": "node source/backend/src/database/initialize.js",
+    "db:seed": "node source/backend/src/database/seed.js",
+    "db:reset": "node source/backend/src/database/initialize.js --fresh && node source/backend/src/database/seed.js",
     "qa:structure": "node tests/structure.test.mjs",
-    "qa:responsive": "node tests/viewport.test.mjs http://localhost:3000/ && node tests/viewport.test.mjs http://localhost:3000/food.html && node tests/viewport.test.mjs http://localhost:3000/places.html && node tests/viewport.test.mjs http://localhost:3000/account.html",
-    "qa:catalogue": "node tests/catalogue.test.mjs",
-    "qa:auth": "node tests/auth.test.mjs",
-    "qa:account": "node tests/account.test.mjs",
-    "qa:data": "node tests/data.test.mjs",
-    "qa:drawers": "node tests/drawers.test.mjs",
-    "qa:a11y": "node tests/accessibility.test.mjs",
-    "qa:perf": "node tests/performance.test.mjs",
-    "qa": "npm run qa:structure && npm run qa:responsive && npm run qa:catalogue && npm run qa:auth && npm run qa:account && npm run qa:data && npm run qa:drawers && npm run qa:a11y && npm run qa:perf",
+    "qa:guide": "node tests/guide.test.mjs",
+    "qa": "npm run qa:structure && npm run qa:guide",
     "benchmark": "node scripts/benchmark-api.mjs",
     "assets:webp": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
-    "bcryptjs": "3.0.3",
-    "express": "5.1.0",
-    "express-session": "1.19.0"
+    "express": "5.1.0"
   }
 }

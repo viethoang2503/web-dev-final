@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const publicDir = path.join(root, 'frontend/public');
+const publicDir = path.join(root, 'source/frontend/public');
 let checks = 0;
 function exists(file, label) {
   assert.ok(existsSync(file), label);
@@ -20,7 +20,7 @@ function walk(directory) {
     return entry.isDirectory() ? walk(fullPath) : [fullPath];
   });
 }
-for (const folder of ['frontend/public/scripts', 'backend/src', 'tests', 'scripts']) {
+for (const folder of ['source/frontend/public/scripts', 'source/backend/src', 'tests', 'scripts']) {
   for (const file of walk(path.join(root, folder)).filter(name => /\.(m?js)$/.test(name))) {
     const source = readFileSync(file, 'utf8');
     for (const match of source.matchAll(/(?:from\s+|import\s*)['"](\.{1,2}\/[^'"]+)['"]/g)) {
@@ -28,7 +28,7 @@ for (const folder of ['frontend/public/scripts', 'backend/src', 'tests', 'script
     }
   }
 }
-for (const page of ['index.html', 'food.html', 'places.html', 'account.html']) {
+for (const page of ['index.html', 'food.html', 'places.html', 'plan.html']) {
   const html = readFileSync(path.join(publicDir, page), 'utf8');
   for (const match of html.matchAll(/(?:src|href)="(\/[^"#?]+)"/g)) {
     const url = match[1];

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hanoi Local — Discover Hanoi like a local</title>
+    <meta
+      name="description"
+      content="Hanoi Local is your insider guide to Hanoi's best street food, historic places and hidden gems. Browse, save favourites and plan one perfect day."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/styles/fonts.css" />
+    <link rel="stylesheet" href="/styles/tokens.css" />
+    <link rel="stylesheet" href="/styles/base.css" />
+    <link rel="stylesheet" href="/styles/home-components.css" />
+    <link rel="stylesheet" href="/styles/pages.css" />
+    <link rel="stylesheet" href="/styles/guide.css" />
+  </head>
+  <body class="desktop-guide">
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- ==================================================================
+         Section A — utility bar and navigation (UI-01)
+         ================================================================== -->
+    <header class="site-header">
+      <div class="utility-bar"><div class="container utility-bar__inner">Hanoi travel guide</div></div>
+      <div class="container site-header__inner">
+        <a class="brand" href="/"><span class="brand__hanoi">Hanoi</span><span class="brand__local">Local</span></a>
+        <nav class="site-nav" aria-label="Main">
+          <ul class="site-nav__list">
+            <li><a class="site-nav__link" href="/" aria-current="page">Home</a></li>
+            <li><a class="site-nav__link" href="/food.html">Eat &amp; drink</a></li>
+            <li><a class="site-nav__link" href="/places.html">See &amp; do</a></li>
+            <li><a class="site-nav__link" href="/plan.html">Plan your day</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="home-hero container" aria-labelledby="hero-heading">
+        <div class="home-hero__copy">
+          <p class="eyebrow">A kinder, more curious Hanoi</p>
+          <h1 id="hero-heading"><span>Discover</span> Hanoi.<br />Like a local.</h1>
+          <p class="home-hero__lede">Taste the streets, explore timeless places,<br />and plan a day that feels entirely yours.</p>
+          <div class="home-hero__actions">
+            <a class="button button--primary" href="/places.html" id="hero-explore-btn">Explore places <span aria-hidden="true">→</span></a>
+            <a class="button button--secondary" href="/food.html" id="hero-food-btn">Find local food <span aria-hidden="true">→</span></a>
+          </div>
+          <!-- Data hooks used by home.js; not part of the visual hero. -->
+          <dl hidden>
+            <div><dt>Food picks</dt><dd data-role="stat-food"></dd></div>
+            <div><dt>Places</dt><dd data-role="stat-places"></dd></div>
+            <div><dt>Districts</dt><dd data-role="stat-districts"></dd></div>
+          </dl>
+        </div>
+        <div class="home-collage" aria-label="A glimpse of Hanoi">
+          <figure class="home-collage__lake">
+            <img src="/assets/images/hero/hoan-kiem-lake.webp" alt="Turtle Tower reflected in Hoan Kiem Lake" width="960" height="640" fetchpriority="high" />
+          </figure>
+          <figure class="home-collage__street">
+            <img src="/uploads/cafe-duong-tau.jpg" alt="A train between Hanoi's flag-lined streetside cafés" width="1200" height="1799" />
+          </figure>
+          <figure class="home-collage__food">
+            <img src="/assets/images/hero/street-food.webp" alt="Beef pho with rice noodles and fresh herbs" width="500" height="585" />
+          </figure>
+          <figure class="home-collage__heritage">
+            <img src="/assets/images/hero/temple-of-literature.webp" alt="Khue Van Pavilion at the Temple of Literature" width="1200" height="900" />
+          </figure>
+        </div>
+      </section>
+
+      <section class="home-interests container" aria-labelledby="tiles-heading">
+        <div class="section__head">
+          <h2 id="tiles-heading">Start with what you love</h2>
+        </div>
+        <div class="interest-grid">
+          <a class="interest" href="/food.html">
+            <img src="/assets/images/tiles/local-food.webp" alt="A close-up of a bowl of pho" width="500" height="585" />
+            <span class="interest__label">Local food <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="interest" href="/places.html">
+            <img src="/assets/images/tiles/historic-hanoi.webp" alt="The Temple of Literature framed by trees" width="1200" height="900" />
+            <span class="interest__label">Historic Hanoi <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="interest" href="/plan.html">
+            <img src="/assets/images/tiles/build-my-day.webp" alt="A quiet view across Hoan Kiem Lake" width="960" height="640" />
+            <span class="interest__label">Build my day <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+      </section>
+
+      <section class="home-tours container" aria-labelledby="tour-heading">
+        <div class="section__head">
+          <h2 id="tour-heading">Three good ways to begin</h2>
+          <p>Pick a route, then adjust it to fit your day.</p>
+        </div>
+        <div class="home-tour-grid" data-role="tour-grid"></div>
+      </section>
+
+      <section class="guide-section container" aria-labelledby="food-heading">
+        <div class="section__head section__head--row">
+          <div><h2 id="food-heading">A taste of everyday Hanoi</h2><p>Small stools, big flavours. Find your next favourite.</p></div>
+          <a class="button button--text" href="/food.html">View all food <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="card-grid home-food-grid" data-role="food-grid"></div>
+      </section>
+
+      <section class="guide-section container" aria-labelledby="places-heading">
+        <div class="section__head section__head--row">
+          <div><h2 id="places-heading">Make room for a little wonder</h2><p>Lakeside walks, quiet courtyards and stories worth stopping for.</p></div>
+          <a class="button button--text" href="/places.html">View all places <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="card-grid home-places-grid" data-role="places-grid"></div>
+      </section>
+
+      <section class="day-plan container" id="planner" aria-labelledby="planner-heading">
+        <div class="day-plan__copy">
+          <p class="eyebrow">Hanoi, your way</p>
+          <h2 id="planner-heading">Three days.<br />Entirely yours.</h2>
+          <p>Start from a ready tour or choose each restaurant and place yourself. Save up to three days in this browser.</p>
+          <a class="button button--primary" href="/plan.html" id="planner-start-btn">Start my day plan <span aria-hidden="true">→</span></a>
+        </div>
+        <ol class="day-plan__slots">
+          <li><h3>Morning</h3><p>Breakfast noodles and a walk by the lake.</p></li>
+          <li><h3>Afternoon</h3><p>A quiet temple, then time for coffee.</p></li>
+          <li><h3>Evening</h3><p>Grilled pork and another street to explore.</p></li>
+        </ol>
+      </section>
+    </main>
+
+    <!-- ==================================================================
+         Section H — footer (UI-02)
+         ================================================================== -->
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <div>
+          <p class="brand">
+            <span class="brand__hanoi">Hanoi</span><span style="color: var(--color-paper)">Local</span>
+          </p>
+          <p class="site-footer__summary">
+            Explore local food and places, then build a plan for up to three days.
+          </p>
+        </div>
+
+        <nav aria-labelledby="footer-nav-heading">
+          <p class="site-footer__heading" id="footer-nav-heading">Browse</p>
+          <ul class="site-footer__list">
+            <li><a href="/">Home</a></li>
+            <li><a href="/food.html">Eat &amp; drink</a></li>
+            <li><a href="/places.html">See &amp; do</a></li>
+            <li><a href="/plan.html">Plan your day</a></li>
+          </ul>
+        </nav>
+
+        <div>
+          <p class="site-footer__heading">About</p>
+          <ul class="site-footer__list">
+            <li>USTH web application final project</li>
+            <li>Group 33</li>
+            <li>Vietnamese interface planned</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="container site-footer__credits">
+        Built by Vu Quang Huy, Nguyen Khac Hung, Bui Viet Hoang, Nguyen Ba Khoa and Nghiem Trong
+        Quoc Anh. Not affiliated with any tourism board.
+      </p>
+    </footer>
+
+    <script type="module" src="/scripts/pages/home.page.js"></script>
+  </body>
+</html>

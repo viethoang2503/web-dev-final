@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plan your day — Hanoi Local</title>
+  <meta name="description" content="Plan up to three days in Hanoi with suggested tours, restaurants and clear times." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles/fonts.css" />
+  <link rel="stylesheet" href="/styles/tokens.css" />
+  <link rel="stylesheet" href="/styles/base.css" />
+  <link rel="stylesheet" href="/styles/guide.css" />
+</head>
+<body class="guide-page">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+      <div class="utility-bar"><div class="container utility-bar__inner">Hanoi travel guide</div></div>
+      <div class="container site-header__inner">
+        <a class="brand" href="/"><span class="brand__hanoi">Hanoi</span><span class="brand__local">Local</span></a>
+        <nav class="site-nav" aria-label="Main">
+          <ul class="site-nav__list">
+            <li><a class="site-nav__link" href="/">Home</a></li>
+            <li><a class="site-nav__link" href="/food.html">Eat &amp; drink</a></li>
+            <li><a class="site-nav__link" href="/places.html">See &amp; do</a></li>
+            <li><a class="site-nav__link" href="/plan.html" aria-current="page">Plan your day</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+<main id="main" class="container plan-page">
+  <section class="plan-intro">
+    <p class="eyebrow">Plan your day</p>
+    <h1>A Hanoi trip that fits you.</h1>
+    <p>Choose a date and starting point. Pick one of three tours or add your own food and places. Your plan stays in this browser.</p>
+  </section>
+  <section class="plan-settings" aria-label="Trip dates and starting point">
+    <label>Starting date<input id="start-date" class="input" type="date" required /></label>
+    <label>Number of days<select id="day-count" class="input"><option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option></select></label>
+    <label>Trip starting point<select id="trip-origin" class="input"></select></label>
+  </section>
+  <div id="day-tabs" class="day-tabs" aria-label="Choose a day"></div>
+  <section class="plan-day" aria-labelledby="day-title">
+    <div class="plan-day__heading"><h2 id="day-title"></h2><label>Start this day from<select id="day-origin" class="input"></select></label></div>
+    <div class="plan-layout">
+      <div class="plan-options">
+        <section aria-labelledby="tour-title">
+          <h3 id="tour-title">Choose a ready-made tour</h3>
+          <p>Each tour can be adjusted after you add it.</p>
+          <div id="tour-list" class="tour-list"></div>
+        </section>
+        <section class="plan-manual" aria-labelledby="manual-title">
+          <h3 id="manual-title">Or choose your own stops</h3>
+          <form id="add-food" class="plan-add-form">
+            <h4>Food and drink</h4>
+            <label>Dish<select id="food-choice" class="input"></select></label>
+            <label>Restaurant<select id="venue-choice" class="input"></select></label>
+            <label>Part of day<select id="food-slot" class="input"><option value="morning">Morning</option><option value="afternoon">Afternoon</option><option value="evening">Evening</option></select></label>
+            <button type="submit" class="button button--secondary">Add restaurant</button>
+          </form>
+          <form id="add-place" class="plan-add-form">
+            <h4>Place to visit</h4>
+            <label>Place<select id="place-choice" class="input"></select></label>
+            <label>Part of day<select id="place-slot" class="input"><option value="morning">Morning</option><option value="afternoon">Afternoon</option><option value="evening">Evening</option></select></label>
+            <button type="submit" class="button button--secondary">Add place</button>
+          </form>
+        </section>
+      </div>
+      <section class="plan-timeline" aria-labelledby="timeline-title">
+        <h3 id="timeline-title">Your schedule</h3>
+        <p>Times are suggestions. Check restaurant and attraction hours before travelling.</p>
+        <p id="plan-status" role="status" aria-live="polite"></p>
+        <div id="timeline"></div>
+      </section>
+    </div>
+  </section>
+</main>
+<footer class="guide-footer"><div class="container"><strong>Hanoi Local</strong><p>Discover food, see the city and plan your days in Hanoi.</p></div></footer>
+<script type="module" src="/scripts/pages/plan.page.js"></script>
+</body></html>

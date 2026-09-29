@@ -10,7 +10,7 @@
  * What this is: a classroom comparison on one machine, over loopback, against
  * SQLite with 20 rows. It says the API is not accidentally slow. It says
  * nothing about production scalability, and it deliberately leaves
- * register/login alone so the database is not polluted (docs/05 section 6).
+ * Chỉ đo GET; không sửa dữ liệu SQLite.
  */
 
 import http from 'node:http';
