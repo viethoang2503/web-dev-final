@@ -4,7 +4,9 @@ Website hướng dẫn khám phá Hà Nội cho bài thuyết trình 5 phút. Ba
 
 1. **Eat & drink:** xem 10 món; mỗi món có ít nhất 2 quán cụ thể.
 2. **See & do:** tìm điểm tham quan, xem thời gian tham khảo và mở Google Maps.
-3. **Plan your day:** chọn ngày bắt đầu, tối đa 3 ngày, chọn mốc xuất phát và dùng một trong 3 tour mẫu hoặc tự thêm điểm dừng.
+3. **Plan your day:** chọn ngày bắt đầu và ngày kết thúc (1-30 ngày), chọn mốc xuất phát rồi dùng tour mẫu hoặc tự thêm điểm dừng. Tour mẫu được dựng theo mốc xuất phát và mỗi ngày một khác; nút "Fill every empty day" điền các ngày còn trống bằng các tour khác nhau.
+
+Trong Plan có thể dời thứ tự điểm dừng, ghim giờ, mở cả tuyến trong Google Maps, chia sẻ lịch bằng link (lịch nằm trong phần `#plan=` của URL, không qua server), in lịch và tải file `.ics` cho lịch điện thoại. Có nút Optimise order (sắp lại trong từng buổi theo điểm gần nhất), mục Nearby ideas (gợi ý điểm gần và còn mở cửa), lưu tối đa 10 lịch có tên và 10 tour tự tạo trong trình duyệt.
 
 Không cần tài khoản. Món yêu thích và lịch nằm trong `localStorage` của trình duyệt hiện tại, nên sẽ không tự đồng bộ sang máy khác.
 
@@ -47,7 +49,7 @@ Lịch tự xếp giờ theo ba buổi: sáng từ 08:00, chiều từ 12:00, t�
 
 ## Kiểm tra
 
-Chạy server trước rồi chạy `npm run qa`. Lệnh này kiểm tra đường dẫn source và luồng Home → món/quán → tour → lịch 3 ngày bằng Chrome. `npm run benchmark` chỉ đo các API GET trên máy local.
+Chạy server trước rồi chạy `npm run qa`. Lệnh này kiểm tra đường dẫn source và luồng Home → món/quán → tour → lịch nhiều ngày bằng Chrome. `npm run benchmark` chỉ đo các API GET trên máy local.
 
 Home giữ bố cục desktop theo mockup. Food, Places và Plan được làm gọn để demo nhanh. Tài liệu và mockup của nhóm còn trên máy trong `docs/`, không được đẩy lên Git.
 

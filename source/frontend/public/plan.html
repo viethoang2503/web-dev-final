@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Plan your day — Hanoi Local</title>
-  <meta name="description" content="Plan up to three days in Hanoi with suggested tours, restaurants and clear times." />
+  <meta name="description" content="Plan your days in Hanoi with tours built around your starting point, restaurants and clear times." />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/styles/fonts.css" />
   <link rel="stylesheet" href="/styles/tokens.css" />
@@ -31,31 +31,39 @@
 <main id="main" class="container plan-page">
   <section class="plan-intro">
     <p class="eyebrow">Plan your day</p>
-    <h1>A Hanoi trip that fits you.</h1>
-    <p>Choose a date and starting point. Pick one of three tours or add your own food and places. Your plan stays in this browser.</p>
+    <h1>Build your Hanoi day</h1>
+    <p>Start with a ready-made tour or add your own stops. Your plan stays in this browser.</p>
   </section>
-  <section class="plan-settings" aria-label="Trip dates and starting point">
+  <section class="plan-settings" aria-label="Trip settings">
     <label>Starting date<input id="start-date" class="input" type="date" required /></label>
-    <label>Number of days<select id="day-count" class="input"><option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option></select></label>
-    <label>Trip starting point<select id="trip-origin" class="input"></select></label>
+    <label>Ending date<input id="end-date" class="input" type="date" required /></label>
+    <label>Number of days<input id="day-count" class="input" type="number" min="1" max="30" step="1" inputmode="numeric" required /></label>
+    <label>Start from<select id="trip-origin" class="input"></select></label>
   </section>
-  <div id="day-tabs" class="day-tabs" aria-label="Choose a day"></div>
-  <section class="plan-day" aria-labelledby="day-title">
-    <div class="plan-day__heading"><h2 id="day-title"></h2><label>Start this day from<select id="day-origin" class="input"></select></label></div>
+  <div id="day-tabs" class="day-tabs" role="tablist" aria-label="Choose a day"></div>
+  <section id="day-panel" class="plan-day" role="tabpanel" aria-labelledby="day-title">
+    <div class="plan-day__heading">
+      <h2 id="day-title"></h2>
+      <details class="day-origin">
+        <summary>Start this day somewhere else</summary>
+        <label>Start this day from<select id="day-origin" class="input"></select></label>
+      </details>
+    </div>
     <div class="plan-layout">
       <div class="plan-options">
         <section aria-labelledby="tour-title">
-          <h3 id="tour-title">Choose a ready-made tour</h3>
-          <p>Each tour can be adjusted after you add it.</p>
+          <h3 id="tour-title"><span class="step">1</span>Start with a tour</h3>
+          <p id="tour-note" class="plan-hint"></p>
           <div id="tour-list" class="tour-list"></div>
+          <button id="plan-all" type="button" class="button button--secondary plan-all" hidden>Fill every empty day with a different tour</button>
         </section>
         <section class="plan-manual" aria-labelledby="manual-title">
-          <h3 id="manual-title">Or choose your own stops</h3>
+          <h3 id="manual-title"><span class="step">2</span>Or add your own stops</h3>
           <form id="add-food" class="plan-add-form">
             <h4>Food and drink</h4>
             <label>Dish<select id="food-choice" class="input"></select></label>
-            <label>Restaurant<select id="venue-choice" class="input"></select></label>
             <label>Part of day<select id="food-slot" class="input"><option value="morning">Morning</option><option value="afternoon">Afternoon</option><option value="evening">Evening</option></select></label>
+            <label class="plan-add-form__wide">Restaurant<select id="venue-choice" class="input"></select></label>
             <button type="submit" class="button button--secondary">Add restaurant</button>
           </form>
           <form id="add-place" class="plan-add-form">
@@ -64,17 +72,66 @@
             <label>Part of day<select id="place-slot" class="input"><option value="morning">Morning</option><option value="afternoon">Afternoon</option><option value="evening">Evening</option></select></label>
             <button type="submit" class="button button--secondary">Add place</button>
           </form>
+          <form id="add-custom" class="plan-add-form">
+            <h4>Something else</h4>
+            <p class="plan-add-form__wide plan-hint">Type any dish, café or activity that is not in the guide. It goes straight into your schedule.</p>
+            <label class="plan-add-form__wide">What<input id="custom-name" class="input" type="text" maxlength="80" required placeholder="For example: Bún riêu for breakfast" /></label>
+            <label class="plan-add-form__wide">Where<input id="custom-address" class="input" type="text" maxlength="120" placeholder="Restaurant name or address (optional)" /></label>
+            <label>Start time (optional)<input id="custom-time" class="input" type="time" /></label>
+            <label>Time there (minutes)<input id="custom-length" class="input" type="number" min="15" max="480" step="5" value="60" /></label>
+            <label class="plan-add-form__wide">Part of day, if you left the time empty<select id="custom-slot" class="input"><option value="morning">Morning</option><option value="afternoon">Afternoon</option><option value="evening">Evening</option></select></label>
+            <button type="submit" class="button button--secondary">Add to my schedule</button>
+          </form>
+        </section>
+        <section class="nearby" aria-labelledby="nearby-title">
+          <h3 id="nearby-title"><span class="step">3</span>Ideas near your last stop</h3>
+          <div id="nearby"></div>
         </section>
       </div>
       <section class="plan-timeline" aria-labelledby="timeline-title">
-        <h3 id="timeline-title">Your schedule</h3>
-        <p>Times are suggestions. Check restaurant and attraction hours before travelling.</p>
-        <p id="plan-status" role="status" aria-live="polite"></p>
+        <div class="plan-timeline__head">
+          <h3 id="timeline-title">Your schedule</h3>
+          <div class="plan-tools">
+            <a id="route-link" class="button button--primary" href="#" target="_blank" rel="noopener noreferrer" hidden>Open in Google Maps</a>
+            <details id="more-menu" class="more-menu">
+              <summary class="button button--secondary">More</summary>
+              <div class="more-menu__list">
+                <button id="optimise-order" type="button" class="text-action">Shorten the route (reorder)</button>
+                <button id="copy-share" type="button" class="text-action">Copy share link</button>
+                <button id="print-plan" type="button" class="text-action">Print plan</button>
+                <button id="download-ics" type="button" class="text-action">Add to calendar (.ics)</button>
+                <button id="open-library" type="button" class="text-action">Save plan or tour…</button>
+              </div>
+            </details>
+          </div>
+        </div>
+        <p class="plan-hint">Times are estimates. Check opening hours before you go.</p>
+        <div id="plan-status" role="status" aria-live="polite"></div>
+        <label id="share-fallback" class="plan-share-fallback" hidden>Copy this link<input id="share-url" class="input" type="text" readonly /></label>
+        <div id="day-summary"></div>
         <div id="timeline"></div>
       </section>
     </div>
   </section>
+  <details id="plan-library" class="plan-library">
+    <summary>Saved plans and my tours</summary>
+    <div class="plan-library__grid">
+      <div>
+        <form id="save-plan" class="plan-library__form">
+          <label>Plan name<input id="plan-name" class="input" type="text" maxlength="40" placeholder="For example: Weekend with friends" /></label>
+          <button type="submit" class="button button--secondary">Save current plan</button>
+          <button id="new-plan" type="button" class="button button--secondary">Start a new empty plan</button>
+        </form>
+        <ul id="saved-plans" class="plan-library__list"></ul>
+      </div>
+      <form id="save-tour" class="plan-library__form">
+        <label>Save this day as my tour<input id="tour-name" class="input" type="text" maxlength="40" placeholder="For example: Lazy Sunday" /></label>
+        <button type="submit" class="button button--secondary">Save as my tour</button>
+      </form>
+    </div>
+  </details>
 </main>
+<section id="print-view" class="print-view" aria-hidden="true"></section>
 <footer class="guide-footer"><div class="container"><strong>Hanoi Local</strong><p>Discover food, see the city and plan your days in Hanoi.</p></div></footer>
 <script type="module" src="/scripts/pages/plan.page.js"></script>
 </body></html>

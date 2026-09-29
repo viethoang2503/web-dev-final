@@ -16,6 +16,9 @@ CREATE TABLE IF NOT EXISTS spots (
   rating            REAL CHECK (rating IS NULL OR rating BETWEEN 0 AND 5),
   duration_minutes  INTEGER CHECK (duration_minutes IS NULL OR duration_minutes > 0),
   image_url         TEXT NOT NULL,
+  -- Tọa độ gần đúng của điểm tham quan, dùng để ước tính khoảng cách trong lịch.
+  lat               REAL CHECK (lat IS NULL OR lat BETWEEN -90 AND 90),
+  lng               REAL CHECK (lng IS NULL OR lng BETWEEN -180 AND 180),
   address           TEXT,
   opening_hours     TEXT,
   local_tip         TEXT,

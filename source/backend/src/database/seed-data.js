@@ -184,6 +184,8 @@ const FOOD = [
 const PLACES = [
   {
     id: 'place-hoan-kiem-lake',
+    lat: 21.029,
+    lng: 105.852,
     name: 'Hoan Kiem Lake',
     category: 'Landmark',
     district: 'Hoan Kiem',
@@ -201,6 +203,8 @@ const PLACES = [
   },
   {
     id: 'place-old-quarter',
+    lat: 21.035,
+    lng: 105.849,
     name: 'Old Quarter',
     category: 'Neighbourhood',
     district: 'Hoan Kiem',
@@ -218,6 +222,8 @@ const PLACES = [
   },
   {
     id: 'place-temple-of-literature',
+    lat: 21.03,
+    lng: 105.836,
     name: 'Temple of Literature',
     category: 'Heritage',
     district: 'Dong Da',
@@ -235,6 +241,8 @@ const PLACES = [
   },
   {
     id: 'place-thang-long-citadel',
+    lat: 21.036,
+    lng: 105.84,
     name: 'Imperial Citadel of Thang Long',
     category: 'Heritage',
     district: 'Ba Dinh',
@@ -252,6 +260,8 @@ const PLACES = [
   },
   {
     id: 'place-ho-chi-minh-complex',
+    lat: 21.037,
+    lng: 105.835,
     name: 'Ho Chi Minh Mausoleum Area',
     category: 'Heritage',
     district: 'Ba Dinh',
@@ -269,6 +279,8 @@ const PLACES = [
   },
   {
     id: 'place-museum-of-ethnology',
+    lat: 21.04,
+    lng: 105.799,
     name: 'Museum of Ethnology',
     category: 'Museum',
     district: 'Cau Giay',
@@ -286,6 +298,8 @@ const PLACES = [
   },
   {
     id: 'place-hoa-lo-prison',
+    lat: 21.026,
+    lng: 105.846,
     name: 'Hoa Lo Prison Memorial',
     category: 'Museum',
     district: 'Hoan Kiem',
@@ -302,6 +316,8 @@ const PLACES = [
   },
   {
     id: 'place-tran-quoc-pagoda',
+    lat: 21.048,
+    lng: 105.837,
     name: 'Tran Quoc Pagoda',
     category: 'Pagoda',
     district: 'Tay Ho',
@@ -319,6 +335,8 @@ const PLACES = [
   },
   {
     id: 'place-long-bien-bridge',
+    lat: 21.041,
+    lng: 105.86,
     name: 'Long Bien Bridge',
     category: 'Landmark',
     district: 'Long Bien',
@@ -335,6 +353,8 @@ const PLACES = [
   },
   {
     id: 'place-womens-museum',
+    lat: 21.023,
+    lng: 105.85,
     name: "Vietnamese Women's Museum",
     category: 'Museum',
     district: 'Hoan Kiem',

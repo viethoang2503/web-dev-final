@@ -35,6 +35,14 @@ async function assertServerNotRunning() {
   }
 }
 
+/** CREATE TABLE IF NOT EXISTS không thêm cột mới vào file SQLite cũ, nên bổ sung ở đây. */
+function addMissingColumns(db) {
+  const existing = new Set(db.prepare('PRAGMA table_info(spots)').all().map((column) => column.name));
+  for (const column of ['lat', 'lng']) {
+    if (!existing.has(column)) db.exec(`ALTER TABLE spots ADD COLUMN ${column} REAL`);
+  }
+}
+
 export function initDatabase({ fresh = false } = {}) {
   if (fresh) {
     closeDb();
@@ -46,6 +54,7 @@ export function initDatabase({ fresh = false } = {}) {
   const schema = readFileSync(path.join(here, 'schema.sql'), 'utf8');
   const db = getDb();
   db.exec(schema);
+  addMissingColumns(db);
   return db;
 }
 

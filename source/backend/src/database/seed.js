@@ -13,11 +13,11 @@ import { spots, seedSummary } from './seed-data.js';
 const UPSERT_SPOT = `
   INSERT INTO spots (
     id, kind, name, short_description, description, category, district,
-    price_level, admission, rating, duration_minutes, image_url,
+    price_level, admission, rating, duration_minutes, image_url, lat, lng,
     address, opening_hours, local_tip, featured
   ) VALUES (
     :id, :kind, :name, :short_description, :description, :category, :district,
-    :price_level, :admission, :rating, :duration_minutes, :image_url,
+    :price_level, :admission, :rating, :duration_minutes, :image_url, :lat, :lng,
     :address, :opening_hours, :local_tip, :featured
   )
   ON CONFLICT (id) DO UPDATE SET
@@ -32,6 +32,8 @@ const UPSERT_SPOT = `
     rating = excluded.rating,
     duration_minutes = excluded.duration_minutes,
     image_url = excluded.image_url,
+    lat = excluded.lat,
+    lng = excluded.lng,
     address = excluded.address,
     opening_hours = excluded.opening_hours,
     local_tip = excluded.local_tip,
@@ -53,6 +55,8 @@ function toRow(spot) {
     rating: spot.rating ?? null,
     duration_minutes: spot.durationMinutes ?? null,
     image_url: spot.image,
+    lat: spot.lat ?? null,
+    lng: spot.lng ?? null,
     address: spot.address ?? null,
     opening_hours: spot.openingHours ?? null,
     local_tip: spot.localTip ?? null,

@@ -8,7 +8,7 @@ không dùng framework frontend hoặc API bản đồ có khóa.
 - `index.html`: trang chủ và ba tour mẫu.
 - `food.html`: món ăn, nhiều quán cho mỗi món, lưu món yêu thích.
 - `places.html`: điểm tham quan.
-- `plan.html`: lịch 1 đến 3 ngày.
+- `plan.html`: lịch 1 đến 30 ngày, có ngày bắt đầu và kết thúc.
 - `scripts/pages/`: JavaScript khởi tạo và xử lý riêng cho từng trang.
 - `scripts/shared/guide.js`: mốc xuất phát, tour mẫu, localStorage, ước lượng khoảng cách và link Maps.
 - `scripts/shared/ui.js`: tạo phần tử HTML bằng `textContent`.

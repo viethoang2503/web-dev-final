@@ -14,8 +14,9 @@
     "db:seed": "node source/backend/src/database/seed.js",
     "db:reset": "node source/backend/src/database/initialize.js --fresh && node source/backend/src/database/seed.js",
     "qa:structure": "node tests/structure.test.mjs",
+    "qa:schedule": "node tests/schedule.test.mjs",
     "qa:guide": "node tests/guide.test.mjs",
-    "qa": "npm run qa:structure && npm run qa:guide",
+    "qa": "npm run qa:structure && npm run qa:schedule && npm run qa:guide",
     "benchmark": "node scripts/benchmark-api.mjs",
     "assets:webp": "node scripts/optimize-images.mjs"
   },

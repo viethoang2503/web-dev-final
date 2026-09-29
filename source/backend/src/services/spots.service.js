@@ -6,7 +6,7 @@ export const SPOT_KINDS = ['food', 'place'];
 
 const SELECT_COLUMNS = `
   id, kind, name, short_description, description, category, district,
-  price_level, admission, rating, duration_minutes, image_url,
+  price_level, admission, rating, duration_minutes, image_url, lat, lng,
   address, opening_hours, local_tip, featured
 `;
 
@@ -37,6 +37,8 @@ function toSpot(row) {
     spot.admission = row.admission;
     spot.isFree = row.admission === 0;
     spot.durationMinutes = row.duration_minutes;
+    spot.lat = row.lat;
+    spot.lng = row.lng;
   }
 
   return spot;

@@ -9,53 +9,48 @@ export const ORIGINS = [
   { id: 'west-lake', name: 'West Lake', lat: 21.055, lng: 105.832 },
 ];
 
-// Tọa độ gần đúng để sắp xếp gợi ý, không dùng làm đường đi thực tế.
-export const PLACE_POINTS = {
-  'place-hoan-kiem-lake': [21.029, 105.852],
-  'place-old-quarter': [21.035, 105.849],
-  'place-temple-of-literature': [21.030, 105.836],
-  'place-thang-long-citadel': [21.036, 105.840],
-  'place-ho-chi-minh-complex': [21.037, 105.835],
-  'place-museum-of-ethnology': [21.040, 105.799],
-  'place-hoa-lo-prison': [21.026, 105.846],
-  'place-tran-quoc-pagoda': [21.048, 105.837],
-  'place-long-bien-bridge': [21.041, 105.860],
-  'place-womens-museum': [21.023, 105.850],
-};
+export const MAX_DAYS = 30;
+export const MAX_STOPS_PER_DAY = 8;
+export const MAX_CUSTOM_NAME = 80;
+export const MAX_CUSTOM_ADDRESS = 120;
 
+/**
+ * Ba chủ đề tour. `pattern` chỉ mô tả kiểu điểm dừng (món hay địa điểm, buổi nào, ưu tiên nhóm nào);
+ * điểm cụ thể do buildTourStops() chọn theo mốc xuất phát và các ngày khác trong chuyến đi.
+ */
 export const TOURS = [
   {
-    id: 'old-quarter', title: 'Old Quarter, all day',
-    description: 'A first look at the streets, lake and food around Hoan Kiem.',
+    id: 'old-quarter', title: 'Street food and sights',
+    description: 'Local street food and well-known sights close to where you start.',
     image: '/assets/images/hero/old-quarter-street.webp',
-    stops: [
-      { kind: 'food', spotId: 'food-pho-bo', slot: 'morning' },
-      { kind: 'place', spotId: 'place-old-quarter', slot: 'morning' },
-      { kind: 'food', spotId: 'food-bun-cha', slot: 'afternoon' },
-      { kind: 'place', spotId: 'place-hoan-kiem-lake', slot: 'afternoon' },
-      { kind: 'food', spotId: 'food-ca-phe-trung', slot: 'evening' },
+    pattern: [
+      { kind: 'food', slot: 'morning', prefer: ['Noodles'] },
+      { kind: 'place', slot: 'morning', prefer: ['Neighbourhood', 'Landmark'] },
+      { kind: 'food', slot: 'afternoon', prefer: ['Grilled', 'Street snack'] },
+      { kind: 'place', slot: 'afternoon', prefer: ['Landmark'] },
+      { kind: 'food', slot: 'evening', prefer: ['Coffee', 'Specialty'] },
     ],
   },
   {
-    id: 'heritage', title: 'Hanoi heritage',
-    description: 'Quiet courtyards and historic streets with local meals.',
+    id: 'heritage', title: 'Heritage and museums',
+    description: 'Historic sites and museums, with local meals nearby.',
     image: '/uploads/quoc-tu-giam.jpg',
-    stops: [
-      { kind: 'food', spotId: 'food-banh-cuon', slot: 'morning' },
-      { kind: 'place', spotId: 'place-temple-of-literature', slot: 'morning' },
-      { kind: 'food', spotId: 'food-cha-ca', slot: 'afternoon' },
-      { kind: 'place', spotId: 'place-thang-long-citadel', slot: 'afternoon' },
+    pattern: [
+      { kind: 'food', slot: 'morning', prefer: ['Rice and sticky rice', 'Noodles'] },
+      { kind: 'place', slot: 'morning', prefer: ['Heritage'] },
+      { kind: 'food', slot: 'afternoon', prefer: ['Specialty', 'Grilled'] },
+      { kind: 'place', slot: 'afternoon', prefer: ['Heritage', 'Museum'] },
     ],
   },
   {
-    id: 'slow-day', title: 'Take it slowly',
-    description: 'Coffee, water and a relaxed walk towards Truc Bach.',
+    id: 'slow-day', title: 'A slow, relaxed day',
+    description: 'Light bites, coffee and a lakeside or pagoda walk, kept close together.',
     image: '/uploads/hoan-kiem.jpg',
-    stops: [
-      { kind: 'food', spotId: 'food-ca-phe-trung', slot: 'morning' },
-      { kind: 'place', spotId: 'place-hoan-kiem-lake', slot: 'morning' },
-      { kind: 'food', spotId: 'food-pho-cuon', slot: 'afternoon' },
-      { kind: 'place', spotId: 'place-tran-quoc-pagoda', slot: 'afternoon' },
+    pattern: [
+      { kind: 'food', slot: 'morning', prefer: ['Coffee'] },
+      { kind: 'place', slot: 'morning', prefer: ['Landmark', 'Neighbourhood'] },
+      { kind: 'food', slot: 'afternoon', prefer: ['Rolls', 'Street snack'] },
+      { kind: 'place', slot: 'afternoon', prefer: ['Pagoda', 'Landmark'] },
     ],
   },
 ];
@@ -88,31 +83,86 @@ function localDate(days = 0) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
+// Chỉ giữ các trường hợp lệ; giờ và thời lượng tự chỉnh phải nằm trong khoảng cho phép.
+function cleanStop(stop) {
+  const clean = { kind: stop.kind, spotId: stop.spotId, slot: stop.slot };
+  if (stop.kind === 'custom') {
+    clean.name = stop.name.trim().slice(0, MAX_CUSTOM_NAME);
+    clean.address = typeof stop.address === 'string' ? stop.address.trim().slice(0, MAX_CUSTOM_ADDRESS) : '';
+  }
+  if (typeof stop.venueId === 'string') clean.venueId = stop.venueId;
+  if (Number.isInteger(stop.startTime) && stop.startTime >= 0 && stop.startTime < 24 * 60) clean.startTime = stop.startTime;
+  if (Number.isInteger(stop.duration) && stop.duration >= 15 && stop.duration <= 480) clean.duration = stop.duration;
+  return clean;
+}
+
+/** Điểm dừng hợp lệ: món/địa điểm trong catalogue, hoặc điểm người dùng tự nhập (phải có tên). */
+export function isValidStop(stop) {
+  return ['food', 'place', 'custom'].includes(stop?.kind) &&
+    ['morning', 'afternoon', 'evening'].includes(stop?.slot) &&
+    typeof stop?.spotId === 'string' &&
+    (stop.kind !== 'custom' || (typeof stop.name === 'string' && stop.name.trim().length > 0));
+}
+
+function defaultTrip() {
+  return { startDate: localDate(), dayCount: 1, originId: 'hoan-kiem', days: [{ originId: null, stops: [] }] };
+}
+
+/** Biến dữ liệu bất kỳ (localStorage hoặc link chia sẻ) thành lịch hợp lệ; sai dạng thì dùng lịch trống. */
+export function normalizeTrip(saved) {
+  const fallback = defaultTrip();
+  if (!saved || !Array.isArray(saved.days)) return fallback;
+  const dayCount = Number.isInteger(saved.dayCount) && saved.dayCount >= 1 && saved.dayCount <= MAX_DAYS ? saved.dayCount : 1;
+  return {
+    startDate: /^\d{4}-\d{2}-\d{2}$/.test(saved.startDate) ? saved.startDate : fallback.startDate,
+    dayCount,
+    originId: ORIGINS.some((item) => item.id === saved.originId) ? saved.originId : fallback.originId,
+    days: Array.from({ length: Math.max(dayCount, Math.min(saved.days.length, MAX_DAYS)) }, (_, index) => ({
+      originId: ORIGINS.some((item) => item.id === saved.days[index]?.originId) ? saved.days[index].originId : null,
+      stops: Array.isArray(saved.days[index]?.stops)
+        ? saved.days[index].stops.filter(isValidStop).slice(0, MAX_STOPS_PER_DAY).map(cleanStop)
+        : [],
+    })),
+  };
+}
+
 export function readTrip() {
-  const fallback = { startDate: localDate(), dayCount: 1, originId: 'hoan-kiem', days: Array.from({ length: 3 }, () => ({ originId: null, stops: [] })) };
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (!saved || !Array.isArray(saved.days)) return fallback;
-    return {
-      startDate: /^\d{4}-\d{2}-\d{2}$/.test(saved.startDate) ? saved.startDate : fallback.startDate,
-      dayCount: [1, 2, 3].includes(saved.dayCount) ? saved.dayCount : 1,
-      originId: ORIGINS.some((item) => item.id === saved.originId) ? saved.originId : fallback.originId,
-      days: Array.from({ length: 3 }, (_, index) => ({
-        originId: ORIGINS.some((item) => item.id === saved.days[index]?.originId) ? saved.days[index].originId : null,
-        stops: Array.isArray(saved.days[index]?.stops)
-          ? saved.days[index].stops.filter((stop) =>
-            ['food', 'place'].includes(stop?.kind) &&
-            ['morning', 'afternoon', 'evening'].includes(stop?.slot) &&
-            typeof stop?.spotId === 'string'
-          ).slice(0, 6)
-          : [],
-      })),
-    };
-  } catch { return fallback; }
+  try { return normalizeTrip(JSON.parse(localStorage.getItem(STORAGE_KEY))); } catch { return defaultTrip(); }
+}
+
+/** Bỏ điểm dừng trỏ tới món/địa điểm không còn trong catalogue. Trả về số điểm đã bỏ. */
+export function pruneTrip(trip, validIds) {
+  let removed = 0;
+  for (const day of trip.days) {
+    const kept = day.stops.filter((stop) => stop.kind === 'custom' || validIds.has(stop.spotId));
+    removed += day.stops.length - kept.length;
+    day.stops = kept;
+  }
+  return removed;
+}
+
+/** Ngày (1-3) đang giữ điểm này, trừ ngày `exceptDay`; -1 nếu chưa có. */
+export function dayUsingSpot(trip, spotId, exceptDay = -1) {
+  return trip.days.findIndex((day, index) => index < trip.dayCount && index !== exceptDay &&
+    day.stops.some((stop) => stop.spotId === spotId));
 }
 
 export function saveTrip(trip) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(trip));
+}
+
+const parseDate = (text) => { const [year, month, day] = text.split('-').map(Number); return Date.UTC(year, month - 1, day); };
+const isoDate = (time) => new Date(time).toISOString().slice(0, 10);
+
+/** YYYY-MM-DD cộng `count` ngày (tính theo UTC để không lệch vì giờ mùa hè). */
+export function addDays(dateText, count) { return isoDate(parseDate(dateText) + count * 86400000); }
+
+/** Số ngày từ `from` đến `to` (âm nếu `to` trước `from`). */
+export function daysBetween(from, to) { return Math.round((parseDate(to) - parseDate(from)) / 86400000); }
+
+/** Bảo đảm trip.days đủ dài cho `count` ngày. */
+export function ensureDays(trip, count) {
+  while (trip.days.length < count) trip.days.push({ originId: null, stops: [] });
 }
 
 export function dateForDay(startDate, index) {
@@ -142,20 +192,37 @@ export function mapsSearch(name, address) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name}, ${address}`)}`;
 }
 
+/** "Tên, địa chỉ, Hanoi, Vietnam", bỏ phần trống (điểm tự nhập có thể không có địa chỉ). */
+export const placeText = (name, address) => [name, address, 'Hanoi, Vietnam'].filter(Boolean).join(', ');
+
 export function mapsDirections(origin, name, address) {
-  const originText = origin.address
-    ? `${origin.name}, ${origin.address}, Hanoi, Vietnam`
-    : `${origin.name}, Hanoi, Vietnam`;
   const query = new URLSearchParams({
-    api: '1', origin: originText,
-    destination: `${name}, ${address}, Hanoi, Vietnam`,
+    api: '1', origin: placeText(origin.name, origin.address),
+    destination: placeText(name, address),
     travelmode: 'walking',
   });
   return `https://www.google.com/maps/dir/?${query}`;
 }
 
+// Điểm tham quan lấy tọa độ từ API; thiếu dữ liệu thì tạm dùng Hồ Hoàn Kiếm.
+/**
+ * Một tuyến Maps cho cả ngày: xuất phát từ `origin`, đi qua các điểm theo thứ tự.
+ * `stops` là [{ name, address }]; Maps cho tối đa khoảng 9 điểm trung gian.
+ */
+export function mapsRoute(origin, stops) {
+  if (!stops.length) return '';
+  const text = (item) => placeText(item.name, item.address);
+  const query = new URLSearchParams({
+    api: '1',
+    origin: placeText(origin.name, origin.address),
+    destination: text(stops.at(-1)),
+  });
+  if (stops.length > 1) query.set('waypoints', stops.slice(0, -1).map(text).join('|'));
+  return `https://www.google.com/maps/dir/?${query}`;
+}
+
 export function spotPoint(spot, venue) {
   if (venue) return venue;
-  const [lat, lng] = PLACE_POINTS[spot.id] ?? [21.029, 105.852];
+  const { lat, lng } = Number.isFinite(spot.lat) && Number.isFinite(spot.lng) ? spot : ORIGINS[0];
   return { lat, lng, name: spot.name };
 }
