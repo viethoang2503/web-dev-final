@@ -55,10 +55,10 @@ async function devtoolsUrl(timeoutMs = 15000) {
  * Open one page, run the callback, always clean up the browser.
  *
  * @param {string} url
- * @param {{ width?: number, height?: number, settleMs?: number }} viewport
+ * @param {{ width?: number, height?: number, settleMs?: number, beforeLoad?: string }} viewport
  * @param {(page: object) => Promise<any>} run
  */
-export async function withPage(url, { width = 1440, height = 900, settleMs = 2200 } = {}, run) {
+export async function withPage(url, { width = 1440, height = 900, settleMs = 2200, beforeLoad = '' } = {}, run) {
   const userDataDir = mkdtempSync(path.join(tmpdir(), 'hanoi-local-chrome-'));
   const chrome = spawn(
     findChrome(),
@@ -113,6 +113,8 @@ export async function withPage(url, { width = 1440, height = 900, settleMs = 220
     await send('Runtime.enable');
     await send('Log.enable');
     await send('Page.enable');
+    // Dùng riêng cho test lỗi tải/lưu, trước khi mã ứng dụng chạy trong profile tạm.
+    if (beforeLoad) await send('Page.addScriptToEvaluateOnNewDocument', { source: beforeLoad });
     await send('Emulation.setDeviceMetricsOverride', {
       width,
       height,
@@ -139,17 +141,19 @@ export async function withPage(url, { width = 1440, height = 900, settleMs = 220
         return page.evaluate(`
           const el = document.querySelector(${JSON.stringify(selector)});
           if (!el) throw new Error('No element for ${selector}');
+          if (!el.checkVisibility() || el.closest('[inert]') || el.disabled) throw new Error('Field is not available: ${selector}');
           el.value = ${JSON.stringify(value)};
           el.dispatchEvent(new Event(${JSON.stringify(eventName)}, { bubbles: true }));
           return true;
         `);
       },
 
-      /** Click through the real event path. */
+      /** Không cho test bấm xuyên vào panel đang ẩn hoặc điều khiển bị vô hiệu. */
       async click(selector) {
         return page.evaluate(`
           const el = document.querySelector(${JSON.stringify(selector)});
           if (!el) throw new Error('No element for ${selector}');
+          if (!el.checkVisibility() || el.closest('[inert]') || el.disabled) throw new Error('Control is not available: ${selector}');
           el.click();
           return true;
         `);
@@ -161,13 +165,13 @@ export async function withPage(url, { width = 1440, height = 900, settleMs = 220
           type: 'keyDown',
           key,
           code,
-          windowsVirtualKeyCode: key === 'Escape' ? 27 : key === 'Tab' ? 9 : 13,
+          windowsVirtualKeyCode: ({ Escape: 27, Tab: 9, Enter: 13, ArrowLeft: 37, ArrowRight: 39, Home: 36, End: 35 })[key] ?? 0,
         });
         await send('Input.dispatchKeyEvent', {
           type: 'keyUp',
           key,
           code,
-          windowsVirtualKeyCode: key === 'Escape' ? 27 : key === 'Tab' ? 9 : 13,
+          windowsVirtualKeyCode: ({ Escape: 27, Tab: 9, Enter: 13, ArrowLeft: 37, ArrowRight: 39, Home: 36, End: 35 })[key] ?? 0,
         });
         await wait(120);
       },
@@ -239,5 +243,6 @@ export function check(label, condition, detail) {
 
 export function summary() {
   console.log(`\n${passed} passed, ${failed} failed.`);
+  if (failed) process.exitCode = 1;
   return failed;
 }

@@ -11,6 +11,24 @@ const venue = (id, name, address, district, lat, lng) => ({
 });
 
 export const FOOD_VENUES = Object.freeze({
+  // Món bổ sung từ tài liệu nhóm. Nguồn đối chiếu nằm trong food-sources.json.
+  // Tọa độ là mốc khu vực ước tính, không phải định vị chính xác cửa quán.
+  'food-chao-suon': [
+    venue('chao-suon-huyen-anh-dong-xuan', 'Cháo Sườn Huyền Anh · Đồng Xuân', '14 Đồng Xuân, Hoàn Kiếm, Hà Nội', 'Hoan Kiem', 21.038, 105.849),
+    venue('chao-suon-huyen-anh-hang-vai', 'Cháo Sườn Huyền Anh · Hàng Vải', '4A Hàng Vải, Hoàn Kiếm, Hà Nội', 'Hoan Kiem', 21.037, 105.848),
+  ],
+  'food-bun-dau-mam-tom': [
+    venue('bun-dau-trung-huong', 'Bún Đậu Trung Hương', '49 ngõ Phất Lộc, Hoàn Kiếm, Hà Nội', 'Hoan Kiem', 21.035, 105.854),
+    venue('bun-dau-cay-da', 'Bún Đậu Cây Đa', '235B Thụy Khuê, Tây Hồ, Hà Nội', 'Tay Ho', 21.043, 105.818),
+  ],
+  'food-bun-rieu': [
+    venue('bun-rieu-hang-bac', 'Bún Riêu Hàng Bạc', '11 Hàng Bạc, Hoàn Kiếm, Hà Nội', 'Hoan Kiem', 21.034, 105.853),
+    venue('bun-rieu-hang-luoc', 'Bún Riêu Hàng Lược', '16 Hàng Lược, Hoàn Kiếm, Hà Nội', 'Hoan Kiem', 21.037, 105.849),
+  ],
+  'food-nem-cuon': [
+    venue('cuon-n-roll-giang-vo', 'Cuốn N Roll · Giảng Võ', 'Tầng 3, nhà D2 Giảng Võ, Ba Đình, Hà Nội', 'Ba Dinh', 21.026, 105.82),
+    venue('cuon-n-roll-tran-thai-tong', 'Cuốn N Roll · Trần Thái Tông', '90 Trần Thái Tông, Cầu Giấy, Hà Nội', 'Cau Giay', 21.031, 105.79),
+  ],
   'food-pho-bo': [
     venue('pho-bat-dan', 'Phở Bát Đàn', '49 Bát Đàn, Hoàn Kiếm, Hà Nội', 'Hoan Kiem', 21.033, 105.846),
     venue('pho-thin-lo-duc', 'Phở Thìn Lò Đúc', '13 Lò Đúc, Hai Bà Trưng, Hà Nội', 'Hai Ba Trung', 21.017, 105.856),

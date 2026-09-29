@@ -64,14 +64,15 @@ function toRow(spot) {
   };
 }
 
-export function seedDatabase() {
+// Có thể truyền tập con để bổ sung nội dung, không ghi đè các bản ghi khác.
+export function seedDatabase(records = spots) {
   initDatabase();
   const db = getDb();
   const statement = db.prepare(UPSERT_SPOT);
 
   db.exec('BEGIN');
   try {
-    for (const spot of spots) {
+    for (const spot of records) {
       statement.run(toRow(spot));
     }
     db.exec('COMMIT');

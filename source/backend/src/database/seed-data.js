@@ -18,6 +18,8 @@
  * description 1-2 short paragraphs, localTip one sentence.
  */
 
+import { GROUP_FOOD } from '../data/group-food.js';
+
 const imageFor = (id) => `/assets/images/spots/${id}`;
 
 const FOOD = [
@@ -373,7 +375,7 @@ const PLACES = [
 
 /** All seed records, normalised into the shape the seed script inserts. */
 export const spots = [
-  ...FOOD.map((item) => ({
+  ...[...FOOD, ...GROUP_FOOD].map((item) => ({
     kind: 'food',
     admission: null,
     durationMinutes: null,
@@ -390,9 +392,9 @@ export const spots = [
 
 /** Distinct filter values, handy for QA and for building filter controls. */
 export const seedSummary = {
-  foodCount: FOOD.length,
+  foodCount: FOOD.length + GROUP_FOOD.length,
   placeCount: PLACES.length,
-  foodCategories: [...new Set(FOOD.map((f) => f.category))].sort(),
+  foodCategories: [...new Set([...FOOD, ...GROUP_FOOD].map((f) => f.category))].sort(),
   placeCategories: [...new Set(PLACES.map((p) => p.category))].sort(),
   districts: [...new Set([...FOOD, ...PLACES].map((s) => s.district))].sort(),
 };

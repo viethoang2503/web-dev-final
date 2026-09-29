@@ -1,0 +1,29 @@
+{
+  "checkedOn": "2026-09-29",
+  "note": "Địa chỉ tham khảo; giờ mở cửa chưa xác minh. Tọa độ xếp hạng gần/xa là mốc khu vực ước tính. Kiểm tra lại trên Google Maps trước khi đi.",
+  "venues": {
+    "food-chao-suon": ["https://vinpearl.com/vi/chao-suon-ha-noi"],
+    "food-bun-dau-mam-tom": ["https://heritagevietnamairlines.cdn.vccloud.vn/wp-content/uploads/2023/08/TRANG-DO%CC%9BN_da%CC%83-su%CC%9B%CC%89a-T29.pdf", "https://restaurantguru.com/Bun-dau-cay-da-Hanoi"],
+    "food-bun-rieu": ["https://www.foody.vn/ha-noi/bun-rieu-hang-bac/binh-luan", "https://vnexpress.net/ba-quan-bun-rieu-via-he-noi-tieng-o-pho-co-ha-noi-3747571.html"],
+    "food-nem-cuon": ["https://cuonnroll.com/gioi-thieu/", "https://cuonnroll.com/cam-nang-am-thuc/nha-hang-cuon-ngon-o-ha-noi-n4-291/"]
+  },
+  "images": {
+    "external": {
+      "food-pho-cuon": {
+        "page": "https://www.vietnamtourism.org.vn/pho-cuon-a-favourite-dish-for-hot-summer-in-hanoi.html",
+        "image": "https://cdn1.vietnamtourism.org.vn/files/thumb/600/400//images/content/2012/07/23/pho-cuon-favourite-dish-for-hot-summer-in-hanoi/c4c2.jpg",
+        "credit": "Vietnam Tourism Information / VOV",
+        "note": "Ảnh đúng món, thay ảnh ghế nhựa cũ. Chưa xác minh giấy phép tái sử dụng; cần xin phép hoặc thay ảnh nhóm tự chụp trước khi phát hành công khai. Chuyển WebP, không sửa nội dung ảnh."
+      }
+    },
+    "source": "https___HNlocalfood.docx supplied by project group",
+    "usage": "Ảnh minh họa món; không khẳng định chụp tại các quán gợi ý. Giữ watermark và ảnh gốc trong tài liệu. Nhóm cần xác nhận quyền sử dụng trước khi phát hành công khai.",
+    "mapping": {
+      "food-cha-ca": "image1.png", "food-bun-thang": "image2.png", "food-ca-phe-trung": "image3.png",
+      "food-xoi-xeo": "image4.png", "food-bun-dau-mam-tom": "image5.png", "food-banh-cuon": "image6.png",
+      "food-pho-bo": "image8.png", "food-bun-rieu": "image9.png", "food-banh-mi": "image10.png",
+      "food-chao-suon": "image11.png", "food-bun-cha": "image12.png", "food-nem-cuon": "image13.png"
+    },
+    "pending": { "image7.png": "Nhãn bún bò Nam Bộ nhưng ảnh thấy tôm và nem rán; chờ nhóm xác nhận." }
+  }
+}

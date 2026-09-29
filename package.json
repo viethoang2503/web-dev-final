@@ -16,7 +16,8 @@
     "qa:structure": "node tests/structure.test.mjs",
     "qa:schedule": "node tests/schedule.test.mjs",
     "qa:guide": "node tests/guide.test.mjs",
-    "qa": "npm run qa:structure && npm run qa:schedule && npm run qa:guide",
+    "qa:plan": "node tests/plan-ux.test.mjs",
+    "qa": "npm run qa:structure && npm run qa:schedule && npm run qa:guide && npm run qa:plan",
     "benchmark": "node scripts/benchmark-api.mjs",
     "assets:webp": "node scripts/optimize-images.mjs"
   },

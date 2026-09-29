@@ -23,7 +23,13 @@ function renderFood() {
   grid.replaceChildren(...shown.map((food) => {
     const card = el('article', 'guide-card');
     card.id = food.id;
-    card.append(picture(food.image, food.name, 'guide-card__photo'));
+    // Ảnh món được nhóm chọn; không gán là ảnh chụp tại một quán cụ thể.
+    const photo = el('figure', 'food-photo');
+    photo.append(picture(food.image, food.name, 'guide-card__photo'), el('figcaption', '', 'Dish illustration. Restaurant servings may vary.'));
+    if (food.id === 'food-pho-cuon') {
+      photo.querySelector('figcaption').append(' Photo: ', link('Vietnam Tourism / VOV', 'https://www.vietnamtourism.org.vn/pho-cuon-a-favourite-dish-for-hot-summer-in-hanoi.html'));
+    }
+    card.append(photo);
     const copy = el('div', 'guide-card__copy');
     copy.append(el('p', 'eyebrow', food.category), el('h2', '', food.name), el('p', '', food.shortDescription));
     const fav = el('button', 'text-action', saved.has(food.id) ? '♥ Saved dish' : '♡ Save dish');
