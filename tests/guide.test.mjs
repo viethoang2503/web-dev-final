@@ -1,3 +1,7 @@
+/**
+ * KIỂM THỬ LUỒNG SỬ DỤNG: mở từng trang bằng Chrome headless rồi thao tác như khách truy cập.
+ * Kiểm tra nội dung, localStorage, tour, lịch nhiều ngày và lỗi JavaScript; cần server đang chạy.
+ */
 /** Kiểm tra ngắn luồng demo: món ăn, quán, tour và lịch nhiều ngày. */
 import { withPage, check, summary } from './helpers/browser.mjs';
 

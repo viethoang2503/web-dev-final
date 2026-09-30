@@ -1,17 +1,8 @@
-/* ==========================================================================
-   Hanoi Local - web fonts
-   Archivo (display) and Manrope (body/UI), self-hosted from Google Fonts.
-   Both are licensed under the SIL Open Font License 1.1.
+/* FONT LƯU TRONG PROJECT: Archivo cho tiêu đề, Manrope cho nội dung.
+unicode-range chọn bộ ký tự Latin/tiếng Việt; font-display: swap hiện font dự phòng trong lúc chờ tải. */
+/* Font được lưu cục bộ; mỗi file hỗ trợ nhiều độ đậm và một tập ký tự. */
 
-   Self-hosted on purpose: the demo must work without an internet connection,
-   and it removes a third-party request from the performance budget.
-
-   Each file is the variable version, so one download covers every weight in
-   the declared range. The vietnamese subset is included now so the future
-   bilingual work (Product Spec section 10) needs no asset changes.
-   ========================================================================== */
-
-/* --- Archivo: display / headlines ------------------------------------- */
+/* --- Archivo: tiêu đề ------------------------------------- */
 
 @font-face {
   font-family: 'Archivo';
@@ -33,7 +24,7 @@
     U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-/* --- Manrope: body and UI --------------------------------------------- */
+/* --- Manrope: nội dung và điều khiển --------------------------------------------- */
 
 @font-face {
   font-family: 'Manrope';

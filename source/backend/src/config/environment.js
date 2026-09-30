@@ -1,3 +1,7 @@
+/**
+ * CẤU HÌNH: đọc .env nếu có, rồi dùng giá trị mặc định cho cổng và đường dẫn.
+ * import.meta.url chỉ vị trí file hiện tại; từ đó suy ra gốc project, không phụ thuộc nơi gõ npm start.
+ */
 /** Đọc cấu hình ở gốc dự án; chạy được ngay cả khi chưa tạo .env. */
 import { existsSync } from 'node:fs';
 import path from 'node:path';

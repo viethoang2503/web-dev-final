@@ -1,6 +1,9 @@
 /**
- * Repository move regression checks. No server or extra dependencies required.
- * Validates relative module imports, page assets and package script entry files.
+ * KIỂM TRA CẤU TRÚC: duyệt mã để kiểm tra đường dẫn import, tài nguyên HTML và lệnh npm.
+ * Đồng thời kiểm tra tài liệu/database không bị đặt vào public để tránh phục vụ công khai.
+ */
+/**
+ * Các kiểm tra đường dẫn chạy trực tiếp bằng Node, không cần server hoặc trình duyệt.
  */
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';

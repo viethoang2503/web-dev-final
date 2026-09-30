@@ -1,4 +1,9 @@
 /**
+ * BỘ TÍNH LỊCH: nhận danh sách điểm và trả { items, summary } để trang Plan hiển thị.
+ * Giờ được biểu diễn bằng số phút từ 00:00: ví dụ 08:30 = 510, giúp cộng thời lượng dễ dàng.
+ * Tách tính toán khỏi giao diện để có thể kiểm thử bằng Node mà không mở trình duyệt.
+ */
+/**
  * Xếp giờ cho một ngày. Hàm thuần, không đụng DOM hay localStorage nên test được
  * bằng Node. Mọi khoảng cách chỉ là ước tính đường chim bay; Maps mới chỉ đường thật.
  */
@@ -99,6 +104,7 @@ export function openingWarning(hours, dateText, start, finish) {
 export function scheduleDay({ stops, origin, dateText, getSpot, getVenue, getPoint }) {
   const ordered = orderStops(stops);
 
+  // cursor là giờ rời điểm trước; previous là vị trí trước đó để tính khoảng cách.
   let cursor = null;
   let previous = origin;
   const items = [];
@@ -109,14 +115,17 @@ export function scheduleDay({ stops, origin, dateText, getSpot, getVenue, getPoi
     const venue = stop.kind === 'food' ? getVenue(stop, spot) : null;
     const point = isCustom ? { lat: previous.lat, lng: previous.lng } : getPoint(spot, venue);
     const km = isCustom ? 0 : approxKm(previous, point);
+    // Điểm đầu bắt đầu ngay ở mốc buổi, chưa cộng thời gian đi từ nơi xuất phát; các điểm sau có thời gian đệm.
     const travel = cursor === null ? 0 : (isCustom ? CUSTOM_TRAVEL_MINUTES : travelMinutes(km));
     const slotStart = SLOT_START[stop.slot];
     const startsSlot = items.at(-1)?.stop.slot !== stop.slot; // chỉ điểm đầu buổi mới bị coi là "trễ" khi buổi trước kéo dài
     const earliest = cursor === null ? 0 : cursor + travel;
     const pinned = Number.isInteger(stop.startTime);
+    // Nếu khách ghim giờ thì giữ giờ đó; nếu tự động thì chọn giờ muộn hơn giữa đầu buổi và giờ có thể đến.
     const start = pinned ? stop.startTime : Math.max(slotStart, earliest);
     const duration = Number.isInteger(stop.duration) ? stop.duration : defaultDuration(spot);
     const end = start + duration;
+    // Cảnh báo chỉ cung cấp thông tin, không tự bỏ điểm hay sửa giờ đã ghim của khách.
     const warnings = [];
     const hoursWarning = openingWarning(spot.openingHours, dateText, start, end);
     if (hoursWarning) warnings.push(hoursWarning);
@@ -140,6 +149,7 @@ export function scheduleDay({ stops, origin, dateText, getSpot, getVenue, getPoi
   }
 
   const places = items.filter((item) => item.spot.kind === 'place');
+  // Tổng hợp cho ô tóm tắt; tiền chỉ cộng vé tham quan, chưa có tiền ăn hoặc vận chuyển.
   const summary = {
     stopCount: items.length,
     startMinutes: items.length ? Math.min(...items.map((item) => item.start)) : null,
@@ -168,10 +178,12 @@ export function optimizeOrder(stops, { origin, getSpot, getVenue, getPoint }) {
   const result = [];
   for (const slot of SLOT_ORDER) {
     const group = ordered.filter((stop) => stop.slot === slot);
+    // Chỉ đổi vị trí các điểm chưa ghim giờ và có tọa độ; giữ vị trí điểm ghim/không có tọa độ.
     const free = group.filter((stop) => !Number.isInteger(stop.startTime) && pointOf(stop));
     const remaining = [...free];
     const sorted = [];
     let from = previous;
+    // Mỗi vòng chọn ứng viên gần nhất, bỏ khỏi danh sách còn lại rồi dùng nó làm điểm xuất phát tiếp theo.
     while (remaining.length) {
       let best = 0;
       for (let index = 1; index < remaining.length; index += 1) {
@@ -214,11 +226,13 @@ export function suggestNearby({ items, origin, spots, usedIds, elsewhereIds = ne
     if (spot.kind === 'food' && !venue) continue;
     const point = getPoint(spot, venue);
     const km = approxKm(from, point);
+    // Ước tính nếu nối thêm điểm này vào cuối ngày thì đến sớm nhất lúc nào.
     const earliest = last ? last.end + travelMinutes(km) : SLOT_START.morning;
     const byTime = SLOT_ORDER.reduce((found, slot, index) => (SLOT_START[slot] <= earliest ? index : found), 0);
     const slot = SLOT_ORDER[Math.max(byTime, lastSlotIndex)];
     const start = Math.max(SLOT_START[slot], earliest);
     const end = start + defaultDuration(spot);
+    // Loại gợi ý kết thúc quá muộn hoặc không vừa giờ mở cửa tham khảo; không kiểm tra giờ thực tế của từng quán.
     if (end > DAY_END || openingWarning(spot.openingHours, dateText, start, end)) continue;
     suggestions.push({ spot, venue, km, slot, start, end, elsewhere: elsewhereIds.has(spot.id) });
   }

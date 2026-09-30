@@ -1,3 +1,7 @@
+/**
+ * BỘ ĐỊNH TUYẾN API: server gắn router này vào /api.
+ * Vì vậy /health ở đây trở thành /api/health; /spots được chuyển tiếp sang spotsRouter.
+ */
 /** Hai API công khai: kiểm tra server và lấy danh sách món/địa điểm. */
 import { Router } from 'express';
 import { spotsRouter } from './spots.routes.js';

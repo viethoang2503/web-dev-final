@@ -1,12 +1,15 @@
 <!doctype html>
+<!-- Trang lập lịch: HTML cung cấp các vùng nhập/hiển thị; plan.page.js quản lý dữ liệu và cập nhật nội dung. -->
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <!-- UTF-8 hỗ trợ tiếng Việt; viewport quy định kích thước vùng hiển thị theo thiết bị. -->
+    <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Plan your day - Hanoi Local</title>
   <meta name="description" content="Plan your days in Hanoi with tours built around your starting point, restaurants and clear times." />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/styles/fonts.css" />
+  <!-- Nạp font → biến thiết kế → CSS nền → CSS riêng; quy tắc phía sau có thể ghi đè phía trước. -->
+    <link rel="stylesheet" href="/styles/fonts.css" />
   <link rel="stylesheet" href="/styles/tokens.css" />
   <link rel="stylesheet" href="/styles/base.css" />
   <link rel="stylesheet" href="/styles/guide.css" />
@@ -14,6 +17,7 @@
 </head>
 <body class="guide-page planner-page">
 <a class="skip-link" href="#main">Skip to content</a>
+<!-- Điều hướng chung giữa bốn trang; aria-current đánh dấu trang đang mở. -->
 <header class="site-header">
       <div class="utility-bar"><div class="container utility-bar__inner">Hanoi travel guide</div></div>
       <div class="container site-header__inner">
@@ -38,7 +42,8 @@
     </div>
     <img src="/assets/images/hero/old-quarter-street.webp" width="1200" height="800" alt="Street in Hanoi's Old Quarter" />
   </section>
-  <noscript><p class="plan-notice">Enable JavaScript to build and save your itinerary.</p></noscript>
+  <!-- Trạng thái khởi động: thông báo khi thiếu JavaScript, đang tải hoặc API lỗi. -->
+<noscript><p class="plan-notice">Enable JavaScript to build and save your itinerary.</p></noscript>
   <div id="planner-loading" class="plan-notice" role="status">Loading restaurants and places…</div>
   <div id="planner-error" class="plan-notice" role="alert" hidden>
     <p>We couldn’t load the guide. Your saved plan has not been changed.</p>
@@ -63,7 +68,8 @@
   </section>
   <section id="planner-workspace" class="plan-workspace" aria-labelledby="days-heading" inert>
   <div class="plan-workspace__heading"><h2 id="days-heading">Build your itinerary</h2><a href="#plan-library" id="library-link">Saved plans &amp; tours</a></div>
-  <div id="day-tabs" class="day-tabs" role="tablist" aria-label="Choose a day"></div>
+  <!-- Tab ngày được tạo từ trip.dayCount; mỗi lần chỉ hiển thị lịch của activeDay. -->
+<div id="day-tabs" class="day-tabs" role="tablist" aria-label="Choose a day"></div>
   <section id="day-panel" class="plan-day" role="tabpanel" aria-labelledby="day-title">
     <div class="plan-layout">
       <section class="plan-options" aria-labelledby="picker-title">
@@ -81,7 +87,8 @@
           <div id="tour-list" class="tour-list"></div>
           <button id="plan-all" type="button" class="text-action plan-all" hidden>Fill all empty days</button>
         </section>
-          <form id="add-food" class="plan-add-form" role="tabpanel" aria-labelledby="picker-food" tabindex="0" hidden>
+          <!-- Chọn món, quán và buổi; submit được JavaScript xử lý để thêm vào ngày đang xem. -->
+<form id="add-food" class="plan-add-form" role="tabpanel" aria-labelledby="picker-food" tabindex="0" hidden>
             <h4>Food and drink</h4>
             <label>Dish<select id="food-choice" class="input"></select></label>
             <label>Part of day<select id="food-slot" class="input"><option value="morning">Morning (from 08:00)</option><option value="afternoon">Afternoon (from 12:00)</option><option value="evening">Evening (from 18:00)</option></select></label>
@@ -91,7 +98,8 @@
             <p class="plan-hint plan-add-form__wide">We fit this stop after others in the same part of day. You can edit the time in your itinerary.</p>
             <button type="submit" class="button button--primary">Add restaurant</button>
           </form>
-          <form id="add-place" class="plan-add-form" role="tabpanel" aria-labelledby="picker-place" tabindex="0" hidden>
+          <!-- Chọn địa điểm trong danh mục; thời gian ở lại mặc định lấy từ API. -->
+<form id="add-place" class="plan-add-form" role="tabpanel" aria-labelledby="picker-place" tabindex="0" hidden>
             <h4>Place to visit</h4>
             <label>Place<select id="place-choice" class="input"></select></label>
             <label>Part of day<select id="place-slot" class="input"><option value="morning">Morning (from 08:00)</option><option value="afternoon">Afternoon (from 12:00)</option><option value="evening">Evening (from 18:00)</option></select></label>
@@ -99,7 +107,8 @@
             <p class="plan-hint plan-add-form__wide">We set an estimated arrival time. Opening-hour conflicts appear in your itinerary.</p>
             <button type="submit" class="button button--primary">Add place</button>
           </form>
-          <form id="add-custom" class="plan-add-form" role="tabpanel" aria-labelledby="picker-custom" tabindex="0" hidden>
+          <!-- Điểm tự nhập chỉ có tên/địa chỉ/giờ, không có tọa độ để tính khoảng cách thực. -->
+<form id="add-custom" class="plan-add-form" role="tabpanel" aria-labelledby="picker-custom" tabindex="0" hidden>
             <h4>Something from your own list</h4>
             <p class="plan-add-form__wide plan-hint">Add a café, a break or an activity that isn’t in the guide.</p>
             <label class="plan-add-form__wide">Stop name (required)<input id="custom-name" class="input" type="text" maxlength="80" required placeholder="For example: Lunch with friends" /></label>
@@ -115,7 +124,8 @@
           <div id="nearby"></div>
         </details>
       </section>
-      <section class="plan-timeline" aria-labelledby="timeline-title">
+      <!-- Vùng kết quả: giờ đến/rời, cảnh báo, nút sửa, xóa và thay thứ tự điểm. -->
+<section class="plan-timeline" aria-labelledby="timeline-title">
         <div class="plan-timeline__head">
           <div><h3 id="timeline-title">Your itinerary</h3><p id="day-title" class="plan-hint"></p></div>
           <div class="plan-tools">
@@ -141,7 +151,8 @@
     </div>
   </section>
   </section>
-  <details id="plan-library" class="plan-library" inert>
+  <!-- Thư viện: lưu cả chuyến đi có tên hoặc biến một ngày thành tour tái sử dụng. -->
+<details id="plan-library" class="plan-library" inert>
     <summary>Saved plans and my tours</summary>
     <div class="plan-library__grid">
       <div>
@@ -161,6 +172,7 @@
 </main>
 <!-- Thông báo luôn thấy được, không cuộn người dùng ra khỏi form đang nhập. -->
 <div id="plan-status" class="plan-status" role="status" aria-live="polite" aria-atomic="true"></div>
+<!-- Dialog xác nhận trước khi thay/xóa; method=dialog trả confirm hoặc cancel cho JavaScript. -->
 <dialog id="confirm-change" aria-labelledby="confirm-title" aria-describedby="confirm-text">
   <h2 id="confirm-title">Replace this day’s stops?</h2>
   <p id="confirm-text"></p>
@@ -169,7 +181,9 @@
     <button id="confirm-apply" class="button button--primary" value="confirm">Replace stops</button>
   </form>
 </dialog>
+<!-- Bản lịch riêng dành cho in: renderPrintView điền nội dung, @media print điều khiển hiển thị. -->
 <section id="print-view" class="print-view" aria-hidden="true"></section>
 <footer class="guide-footer"><div class="container"><strong>Hanoi Local</strong><p>Discover food, see the city and plan your days in Hanoi.</p></div></footer>
+<!-- Module cho phép import các tiện ích dùng chung và chạy sau khi HTML được phân tích. -->
 <script type="module" src="/scripts/pages/plan.page.js"></script>
 </body></html>

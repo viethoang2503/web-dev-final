@@ -1,3 +1,7 @@
+/**
+ * KIỂM THỬ TRẢI NGHIỆM PLAN: kiểm tra tab, focus bàn phím, form, xác nhận thay thế và Undo.
+ * Có mô phỏng tải API chậm/lỗi và localStorage đầy để kiểm tra trạng thái giao diện khi gặp sự cố.
+ */
 /** Hồi quy UX Plan. Mỗi withPage dùng profile tạm, không đụng lịch thật của người dùng. */
 import { withPage, check, summary } from './helpers/browser.mjs';
 

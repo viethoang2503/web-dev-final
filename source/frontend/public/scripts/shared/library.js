@@ -1,4 +1,9 @@
 /**
+ * THƯ VIỆN CÁ NHÂN: lưu tối đa 10 lịch có tên và 10 tour tự tạo bằng hai khóa localStorage.
+ * Lịch có tên giữ toàn bộ chuyến đi; tour chỉ giữ các điểm của một ngày để dùng lại với quán/giờ tính lại.
+ * Tham số storage có thể thay bằng đối tượng giả khi chạy unit test.
+ */
+/**
  * Kho cá nhân trong localStorage: các lịch đã lưu tên và tour tự tạo.
  * Lịch đang chỉnh vẫn nằm ở khóa riêng trong guide.js, nên các trang khác không bị ảnh hưởng.
  */
@@ -12,6 +17,7 @@ export const MAX_NAME_LENGTH = 40;
 
 const newId = () => globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 
+// Đọc mảng JSON từ kho được truyền vào; dữ liệu hỏng trả mảng rỗng để trang vẫn hoạt động.
 function readList(key, storage) {
   try {
     const value = JSON.parse(storage.getItem(key));
@@ -27,6 +33,7 @@ function tourStop(stop) {
   return stop.kind === 'custom' ? { ...base, name: stop.name.trim().slice(0, 80), address: String(stop.address ?? '').trim().slice(0, 120) } : base;
 }
 
+// Kiểm tra các bản lưu, chuẩn hóa lịch và giới hạn số bản trước khi đưa ra giao diện.
 export function readSavedPlans(storage = localStorage) {
   return readList(PLANS_KEY, storage)
     .filter((item) => typeof item?.id === 'string' && typeof item?.name === 'string')
@@ -46,6 +53,7 @@ export function savePlan(name, trip, storage = localStorage, now = Date.now()) {
   return { plans: next, replaced: Boolean(existing) };
 }
 
+// Lọc bỏ bản có id tương ứng rồi ghi lại danh sách; không thay lịch đang chỉnh.
 export function deletePlan(id, storage = localStorage) {
   const next = readSavedPlans(storage).filter((item) => item.id !== id);
   storage.setItem(PLANS_KEY, JSON.stringify(next));
@@ -66,6 +74,7 @@ export function readCustomTours(storage = localStorage) {
     .slice(0, MAX_CUSTOM_TOURS);
 }
 
+// Kiểm tra số điểm và giới hạn tour, tạo id mới rồi lưu mẫu điểm để dùng ở ngày khác.
 export function addCustomTour(title, stops, storage = localStorage) {
   const tours = readCustomTours(storage);
   if (!stops.length) return { error: 'Add at least one stop before saving a tour.', tours };
@@ -80,6 +89,7 @@ export function addCustomTour(title, stops, storage = localStorage) {
   return { tours: readCustomTours(storage) };
 }
 
+// Xóa mẫu trong thư viện; những điểm đã áp dụng vào chuyến đi vẫn là dữ liệu riêng.
 export function deleteCustomTour(id, storage = localStorage) {
   const next = readCustomTours(storage).filter((item) => item.id !== id);
   storage.setItem(TOURS_KEY, JSON.stringify(next));

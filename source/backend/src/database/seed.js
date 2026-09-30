@@ -1,4 +1,9 @@
 /**
+ * NẠP DỮ LIỆU MẪU: đổi tên trường JavaScript sang cột SQL rồi INSERT ... ON CONFLICT UPDATE.
+ * Mỗi id chỉ có một bản ghi; chạy lại seed cập nhật dữ liệu mẫu thay vì nhân đôi.
+ * Transaction giúp cả đợt ghi cùng thành công hoặc cùng được hoàn tác khi có lỗi.
+ */
+/**
  * Repeatable seed script (SET-05).
  *
  *   npm run db:seed
@@ -40,7 +45,7 @@ const UPSERT_SPOT = `
     featured = excluded.featured
 `;
 
-/** Map a seed record (camelCase) onto database columns (snake_case). */
+/** Ánh xạ từng trường dữ liệu mẫu sang tên cột SQL; trường thiếu dùng null hoặc giá trị mặc định. */
 function toRow(spot) {
   return {
     id: spot.id,
@@ -70,6 +75,7 @@ export function seedDatabase(records = spots) {
   const db = getDb();
   const statement = db.prepare(UPSERT_SPOT);
 
+  // Bắt đầu giao dịch: nếu một bản ghi lỗi, ROLLBACK sẽ hủy toàn bộ lần nạp này.
   db.exec('BEGIN');
   try {
     for (const spot of records) {

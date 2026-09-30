@@ -1,3 +1,5 @@
+/* CSS DANH MỤC: khung trang, tìm kiếm, thẻ món/địa điểm và danh sách quán.
+Một số quy tắc .desktop-guide ở cuối bổ sung cho Home; Plan dùng thêm plan.css. */
 /* Trang hướng dẫn gọn cho buổi demo. Home giữ bố cục mockup cũ. */
 .guide-page { background: var(--color-surface); min-width: 900px; }
 .guide-page .container { --container-max: 1450px; --container-pad: clamp(32px, 5vw, 76px); }

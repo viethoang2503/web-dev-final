@@ -1,4 +1,9 @@
-/** Xuất lịch sang file .ics. Giờ để dạng "floating" nên lịch hiện đúng giờ Hà Nội đã ghi. */
+/**
+ * XUẤT LỊCH ĐIỆN THOẠI: biến mỗi điểm dừng thành một VEVENT trong file văn bản .ics.
+ * DTSTART/DTEND không kèm múi giờ (floating): giữ giờ trên mặt đồng hồ, không tự chuyển sang Asia/Ho_Chi_Minh.
+ * Trang Plan tạo Blob và link tải xuống từ chuỗi mà buildIcs trả về.
+ */
+/** Xuất lịch sang file .ics. Giờ dạng "floating" giữ giờ trên mặt đồng hồ, không gắn múi giờ Hà Nội. */
 import { formatTime } from './schedule.js';
 
 const pad = (value) => String(value).padStart(2, '0');
@@ -10,6 +15,7 @@ export function icsLocalTime(dateText, minutes) {
   return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}T${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}00`;
 }
 
+// Thoát dấu phẩy, chấm phẩy, gạch chéo và xuống dòng để nội dung không phá cấu trúc ICS.
 export function escapeIcsText(text) {
   return String(text ?? '').replaceAll('\\', '\\\\').replaceAll(';', '\\;').replaceAll(',', '\\,').replace(/\r?\n/g, '\\n');
 }
@@ -34,6 +40,7 @@ export function foldLine(line) {
  * @param {Array<{dateText: string, items: Array<object>}>} days items lấy từ scheduleDay()
  * @param {{ now?: Date, mapsLink?: (item: object) => string }} [options]
  */
+// Bọc toàn bộ bằng VCALENDAR; mỗi điểm có id, giờ bắt đầu/kết thúc, tên, địa chỉ và ghi chú.
 export function buildIcs(days, { now = new Date(), mapsLink } = {}) {
   const stamp = `${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`;
   const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Hanoi Local//Plan your day//EN', 'CALSCALE:GREGORIAN', 'X-WR-CALNAME:Hanoi Local plan'];

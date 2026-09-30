@@ -1,40 +1,29 @@
 /**
- * Image resolver.
- *
- * Spot and hero images are referenced without a file extension:
- *
- *   /assets/images/spots/food-pho-bo
- *
- * This middleware serves the first format that actually exists, preferring the
- * smallest, and falls back to the placeholder when the photo has not been added
- * yet. Two problems go away:
- *
- * 1. The team can produce AVIF or WebP with whatever tool their machine has.
- *    macOS `sips` writes AVIF but not WebP, `cwebp` writes WebP; either works
- *    and no source file has to be edited to match.
- * 2. A missing photo returns the placeholder with 200 instead of a broken
- *    image, so the layout never depends on a client-side onerror handler.
- *
- * Resolutions are cached, so the disk is checked once per path.
+ * PHỤC VỤ ẢNH: với URL ảnh không có đuôi, thử AVIF → WebP → JPG → JPEG → PNG.
+ * Đây là thứ tự ưu tiên cố định, không đo dung lượng hay thương lượng định dạng theo trình duyệt.
+ * Không tìm thấy ảnh thì trả ảnh thay thế; URL đã có đuôi được chuyển cho express.static.
+ */
+/**
+ * Ảnh có thể được gọi bằng URL không có đuôi, ví dụ /assets/images/spots/food-pho-bo.
+ * Middleware tìm định dạng có sẵn hoặc trả placeholder để tránh biểu tượng ảnh hỏng.
+ * Cache kết quả đường dẫn chỉ được dùng khi chạy production.
  */
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { config } from '../config/environment.js';
 
-/** Smallest first: AVIF beats WebP, which beats the originals. */
+/** Ưu tiên định dạng theo thứ tự cố định; không đo file nào nhỏ nhất. */
 const EXTENSIONS = ['.avif', '.webp', '.jpg', '.jpeg', '.png'];
 
 const PLACEHOLDER = '/assets/images/placeholder.svg';
 
 /**
- * requested path -> resolved path on disk, or null for the placeholder.
- *
- * Only used in production. In development nothing is cached, so adding,
- * replacing or deleting a photo takes effect without restarting the server.
- * existsSync on a handful of candidates is cheap next to sending the file.
+ * Map ánh xạ đường dẫn yêu cầu sang file thật, hoặc null nếu không có ảnh.
+ * Development không cache để nhận ảnh mới ngay khi thêm/thay/xóa file.
  */
 const cache = new Map();
 
+// Tra cache ở production; nếu chưa có thì kiểm tra file trên đĩa theo thứ tự định dạng ưu tiên.
 function resolve(relativePath) {
   if (config.isProduction && cache.has(relativePath)) {
     return cache.get(relativePath);
@@ -53,8 +42,7 @@ function resolve(relativePath) {
 }
 
 /**
- * Handles GET /assets/images/**\/<name> with no extension. Anything with an
- * extension is left to express.static.
+ * Chỉ xử lý URL ảnh không có đuôi; những URL khác tiếp tục sang express.static.
  */
 export function resolveImage(req, res, next) {
   if (req.method !== 'GET' && req.method !== 'HEAD') return next();
@@ -63,7 +51,7 @@ export function resolveImage(req, res, next) {
   if (!requested.startsWith('/assets/images/')) return next();
   if (path.extname(requested) !== '') return next();
 
-  // Reject anything trying to climb out of the images folder.
+  // Chuẩn hóa đường dẫn và chỉ tiếp tục khi vẫn nằm trong vùng URL ảnh.
   const normalised = path.posix.normalize(requested);
   if (!normalised.startsWith('/assets/images/') || normalised.includes('..')) {
     return next();
@@ -72,11 +60,11 @@ export function resolveImage(req, res, next) {
   const relativePath = normalised.slice(1);
   const resolved = resolve(relativePath);
 
-  /** No photo yet: send the placeholder and flag it, so QA can count them. */
+  /** Thiếu ảnh thì trả placeholder và gắn header để công cụ QA nhận biết. */
   const sendPlaceholder = () => {
     res.set('X-Image-Placeholder', 'true');
     res.sendFile(path.join(config.publicDir, PLACEHOLDER.slice(1)), { maxAge: 0 }, (error) => {
-      // The placeholder itself is missing: nothing left to do but pass on.
+      // Nếu cả placeholder cũng lỗi thì chuyển lỗi sang middleware tiếp theo.
       if (error) next(error);
     });
   };
@@ -88,9 +76,8 @@ export function resolveImage(req, res, next) {
   return res.sendFile(resolved, { maxAge: config.isProduction ? '30d' : 0 }, (error) => {
     if (!error) return;
 
-    // The file disappeared between the check and the send, which happens while
-    // photos are being replaced. Drop the stale entry and fall back rather than
-    // turning a missing image into a 500.
+    // Nếu ảnh bị xóa sau khi kiểm tra nhưng trước khi gửi, bỏ cache cũ
+    // và thử trả placeholder khi chưa gửi header phản hồi.
     if (error.code === 'ENOENT') {
       cache.delete(relativePath);
       if (!res.headersSent) return sendPlaceholder();
@@ -101,7 +88,7 @@ export function resolveImage(req, res, next) {
   });
 }
 
-/** Used by the asset report to list what is still missing. */
+/** Hàm tiện ích xóa cache đường dẫn ảnh khi cần làm mới kết quả. */
 export function clearImageCache() {
   cache.clear();
 }

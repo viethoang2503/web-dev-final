@@ -1,21 +1,15 @@
 /**
- * Demo content for Hanoi Local (Product Spec section 7).
- *
- * Fields use the camelCase names from the Content Specification; the seed
- * script maps them onto the snake_case database columns.
- *
- * Conventions
- * - priceLevel: food only, 1 = budget, 2 = mid, 3 = higher.
- * - admission: places only, VND, 0 = free entry.
- * - durationMinutes: places only, a suggested visit length.
- * - image: /assets/images/spots/<id>, deliberately without a file extension.
- *   backend/src/middleware/image-resolver.middleware.js serves whichever format exists (AVIF, WebP or
- *   the original), and the placeholder until the real photo is added in
- *   PERF-01. That means the team can use whatever converter their machine has
- *   without editing this file.
- *
- * Copy limits: card title <= ~45 chars, shortDescription <= 110 chars,
- * description 1-2 short paragraphs, localTip one sentence.
+ * DỮ LIỆU ĐẦU VÀO CHO SEED: FOOD có 10 món, GROUP_FOOD bổ sung 4 món, PLACES có 10 địa điểm.
+ * priceLevel là mức giá món; admission là tiền vé VND; durationMinutes là số phút tham quan.
+ * imageFor tạo URL ảnh không có đuôi để middleware chọn định dạng đang tồn tại.
+ */
+/**
+ * Quy ước dữ liệu mẫu:
+ * - Tên trường JavaScript dùng camelCase; seed.js đổi sang snake_case của SQL.
+ * - priceLevel: 1 = rẻ, 2 = vừa, 3 = cao; chỉ dùng cho món ăn.
+ * - admission: tiền vé VND, 0 = miễn phí; durationMinutes: thời lượng tham quan.
+ * - image: URL không có đuôi; middleware chọn file ảnh có sẵn.
+ * Các mô tả và giờ trong danh mục là nội dung tham khảo được lưu sẵn.
  */
 
 import { GROUP_FOOD } from '../data/group-food.js';
@@ -373,7 +367,7 @@ const PLACES = [
   },
 ];
 
-/** All seed records, normalised into the shape the seed script inserts. */
+/** Ghép món gốc, món bổ sung và địa điểm thành cùng cấu trúc để seed.js ghi vào SQLite. */
 export const spots = [
   ...[...FOOD, ...GROUP_FOOD].map((item) => ({
     kind: 'food',
@@ -390,7 +384,7 @@ export const spots = [
   })),
 ];
 
-/** Distinct filter values, handy for QA and for building filter controls. */
+/** Tổng hợp số lượng và các nhóm/quận không trùng để in thông tin khi seed. */
 export const seedSummary = {
   foodCount: FOOD.length + GROUP_FOOD.length,
   placeCount: PLACES.length,

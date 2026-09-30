@@ -1,7 +1,12 @@
+/**
+ * TRANG CHỦ: dựng thẻ tour từ TOURS, gọi API danh mục rồi hiển thị 4 món và 3 địa điểm đầu tiên.
+ * Link mang id sang trang đích bằng query string hoặc hash để người dùng tiếp tục đúng nội dung.
+ */
 /** Home chỉ tải vài mục nổi bật. Ba tour mẫu nằm trong guide.js. */
 import { loadSpots, TOURS } from '../shared/guide.js';
 import { el, link, picture } from '../shared/ui.js';
 
+// Dựng một thẻ gồm ảnh, nhóm, tên có link và mô tả ngắn.
 function feature(spot, href) {
   const card = el('article', 'home-feature');
   card.append(picture(spot.image, spot.name));
@@ -13,6 +18,7 @@ function feature(spot, href) {
   return card;
 }
 
+// Vẽ tour có sẵn trước, sau đó chờ API để điền các thẻ món ăn và địa điểm.
 async function init() {
   const tourGrid = document.querySelector('[data-role="tour-grid"]');
   if (tourGrid) {

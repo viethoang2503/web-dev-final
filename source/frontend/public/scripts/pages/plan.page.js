@@ -1,4 +1,12 @@
 /**
+ * TRUNG TÂM ĐIỀU KHIỂN TRANG PLAN. Có thể đọc theo thứ tự:
+ * 1. trip và ui: dữ liệu đang sửa và các phần tử HTML tương ứng.
+ * 2. Các hàm render: biến dữ liệu thành giao diện; scheduleFor gọi thuật toán trong schedule.js.
+ * 3. Các sự kiện ở cuối file: nhận thao tác, sửa trip, save(), rồi render lại phần cần thiết.
+ * 4. Khối try cuối file: tải API, đọc link đầu vào, dựng trang và bật các điều khiển.
+ * trip.days chứa các ngày; stops chứa điểm dừng; activeDay bắt đầu từ 0 (Ngày 1).
+ */
+/**
  * Lịch nhiều ngày lưu trong localStorage. Khách chọn điểm, trang tự đặt giờ
  * theo buổi. Khoảng cách và giờ di chuyển chỉ là gợi ý; Maps chỉ đường thật.
  */
@@ -16,6 +24,7 @@ import { buildTourStops } from '../shared/tours.js';
 import { el, link, picture } from '../shared/ui.js';
 import { createPicker, createConfirmation } from '../shared/plan-controls.js';
 
+// TRẠNG THÁI TRANG: trip là nguồn dữ liệu chính; byId giúp tra món/địa điểm theo id nhanh hơn tìm mảng nhiều lần.
 const trip = readTrip();
 let activeDay = 0;
 let spots = [];
@@ -25,6 +34,7 @@ let pendingFocus = null;
 let highlightId = null; // Tô điểm vừa thêm; không tự cuộn làm mất vị trí nhập.
 let storageWarning = '';
 
+// ÁNH XẠ HTML: gom các phần tử theo id để các hàm bên dưới truy cập bằng ui[id].
 const ui = Object.fromEntries([
   'start-date', 'end-date', 'day-count', 'trip-range', 'tour-note', 'plan-all', 'trip-origin', 'day-tabs', 'day-title', 'day-origin',
   'tour-list', 'food-choice', 'venue-choice', 'food-slot', 'place-choice',
@@ -75,6 +85,7 @@ function save() {
   }
 }
 
+// Biến mảng dữ liệu thành các option của select và giữ lựa chọn hiện tại nếu vẫn có.
 function addOptions(select, data, label, selected) {
   select.replaceChildren(...data.map((item) => {
     const option = el('option', '', label(item));
@@ -84,6 +95,7 @@ function addOptions(select, data, label, selected) {
   }));
 }
 
+// Dựng mốc xuất phát chung và riêng từng ngày; giá trị rỗng nghĩa là dùng mốc chung.
 function renderOrigins() {
   addOptions(ui['trip-origin'], ORIGINS, (item) => item.name, trip.originId);
   const shared = el('option', '', 'Use trip starting point');
@@ -97,6 +109,7 @@ function renderOrigins() {
   ui['day-origin'].value = trip.days[activeDay].originId ?? '';
 }
 
+// Dựng tab từng ngày với số điểm; xử lý cả click và phím mũi tên/Home/End.
 function renderTabs() {
   const tabs = Array.from({ length: trip.dayCount }, (_, index) => {
     const active = index === activeDay;
@@ -130,6 +143,7 @@ function renderTabs() {
   ui['day-panel'].setAttribute('aria-labelledby', `day-tab-${activeDay}`);
 }
 
+// Khi đổi món hoặc mốc, cập nhật danh sách quán theo khoảng cách và phần xem trước.
 function renderVenues(selectedId = ui['venue-choice'].value) {
   const food = byId.get(ui['food-choice'].value);
   const venues = food ? sortedVenues(food, currentOrigin()) : [];
@@ -152,17 +166,20 @@ function renderPreview(kind) {
   box.replaceChildren(...(spot.image ? [picture(spot.image, spot.name)] : []), body);
 }
 
+// Dùng quán đã lưu nếu còn tồn tại; nếu thiếu thì chọn quán gần mốc xuất phát nhất.
 function chooseVendor(stop, origin) {
   const food = byId.get(stop.spotId);
   return food?.venues?.find((item) => item.id === stop.venueId) ?? sortedVenues(food ?? {}, origin)[0];
 }
 
+// Tính ngày cụ thể của tab để kiểm tra giờ mở cửa và xuất lịch.
 function localDateFor(index) {
   const date = new Date(`${trip.startDate}T12:00:00`);
   date.setDate(date.getDate() + index);
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
+// Hiển thị giờ, số điểm, khoảng cách và vé; gom số cảnh báo từ từng điểm.
 function renderSummary(summary, items = []) {
   if (!summary.stopCount) { ui['day-summary'].replaceChildren(); return; }
   const rows = [
@@ -188,6 +205,7 @@ function renderSummary(summary, items = []) {
   ui['day-summary'].replaceChildren(box);
 }
 
+// Nút lên/xuống lưu bản trước khi đổi thứ tự, tính lại giờ và hỗ trợ Undo.
 function moveButtons(entry, position, total) {
   return [['up', -1, '↑ Move up', position === 0], ['down', 1, '↓ Move down', position === total - 1]].map(([key, direction, label, disabled]) => {
     const button = el('button', 'timeline-stop__move', key === 'up' ? '↑' : '↓');
@@ -207,6 +225,7 @@ function moveButtons(entry, position, total) {
   });
 }
 
+// Đổi chuỗi HH:mm của input time sang số phút để thuật toán xử lý.
 const toMinutes = (text) => {
   const [hour, minute] = text.split(':').map(Number);
   return Number.isInteger(hour) && Number.isInteger(minute) ? hour * 60 + minute : null;
@@ -286,6 +305,7 @@ function adjustPanel(entry) {
   return details;
 }
 
+// Cầu nối dữ liệu và thuật toán: truyền điểm của ngày cùng các hàm tra món, quán và tọa độ.
 function scheduleFor(index) {
   const origin = originFor(trip, index);
   const dateText = localDateFor(index);
@@ -304,6 +324,7 @@ function scheduleFor(index) {
 const plannedDays = () => Array.from({ length: trip.dayCount }, (_, index) => ({ index, ...scheduleFor(index) }))
   .filter((day) => day.items.length);
 
+// Ẩn link khi ngày trống; khi có điểm thì tạo tuyến Maps theo thứ tự lịch.
 function renderRouteLink(items, origin) {
   const link = ui['route-link'];
   link.hidden = !items.length;
@@ -370,6 +391,7 @@ function renderNearby(items, origin, dateText) {
   ui.nearby.replaceChildren(list);
 }
 
+// Thử thứ tự mới; chỉ nhận kết quả nếu khoảng cách giảm hơn 0,05 km, nếu không khôi phục thứ tự cũ.
 function optimiseDay() {
   const stops = currentStops();
   if (stops.length < 2) return message('Add at least two stops to optimise the order.');
@@ -391,6 +413,7 @@ function optimiseDay() {
   message(`Order optimised inside each part of the day: ~${before.toFixed(1)} km to ~${after.toFixed(1)} km straight-line.`, restore);
 }
 
+// Tính lại lịch ngày đang chọn, cập nhật phần tóm tắt/gợi ý/bản in rồi dựng từng hàng điểm dừng.
 function renderTimeline() {
   const focusedEdit = document.activeElement?.dataset.stopEdit;
   const { items, summary, origin, dateText: localDate } = scheduleFor(activeDay);
@@ -464,6 +487,7 @@ function renderTimeline() {
   list.append(...rows);
   ui.timeline.replaceChildren(list);
   highlightId = null;
+  // DOM vừa được thay mới: đưa focus về nút/ô vừa thao tác để người dùng bàn phím không bị mất vị trí.
   if (pendingFocus) {
     const [spotId, key] = pendingFocus.split(':');
     const target = [...ui.timeline.querySelectorAll('[data-move]')].find((button) => button.dataset.move === pendingFocus && !button.disabled)
@@ -492,6 +516,7 @@ function stopsForTour(tour, day) {
   return buildTourStops(tour, { origin, spots, usedIds: usedElsewhere(day), getPoint: spotPoint });
 }
 
+// Chụp bản cũ, thay các điểm của ngày bằng tour được chọn rồi lưu và cập nhật lịch.
 function useTour(tour) {
   const hadStops = currentStops().length > 0;
   const restore = snapshotDay(activeDay);
@@ -530,6 +555,7 @@ function updateTourButtons() {
   }
 }
 
+// Ghép tour mẫu và tour tự lưu, dựng xem trước; yêu cầu xác nhận trong giao diện nếu thay ngày đã có điểm.
 function renderTours() {
   const custom = readCustomTours();
   const origin = currentOrigin();
@@ -588,6 +614,7 @@ function replaceTrip(next, text) {
   return { text, undo: hadPlan ? () => { Object.assign(trip, previous); activeDay = 0; } : undefined };
 }
 
+// Dựng danh sách lịch có tên với nút mở/xóa; mở bản lưu thay toàn bộ lịch đang chỉnh.
 function renderSavedPlans() {
   const plans = readSavedPlans();
   if (!plans.length) {
@@ -623,6 +650,7 @@ function renderSavedPlans() {
   }));
 }
 
+// Đồng bộ ngày bắt đầu, ngày kết thúc và số ngày, đồng thời đặt giới hạn cho ô ngày kết thúc.
 function renderDates() {
   ui['start-date'].value = trip.startDate;
   ui['end-date'].value = addDays(trip.startDate, trip.dayCount - 1);
@@ -634,6 +662,7 @@ function renderDates() {
     : `Your trip ends on ${dateForDay(trip.startDate, trip.dayCount - 1)}.`;
 }
 
+// Cập nhật toàn bộ giao diện từ trip; gọi khi đổi ngày hoặc thay cấu hình của chuyến đi.
 function render() {
   settingsError(null, '');
   renderDates();
@@ -647,6 +676,7 @@ function settingsError(field, text) {
   if (field) ui[field].setAttribute('aria-invalid', 'true');
   ui['settings-error'].textContent = text;
 }
+// SỰ KIỆN CẤU HÌNH: kiểm tra đầu vào trước khi sửa trip, sau đó lưu và vẽ lại.
 ui['start-date'].addEventListener('change', () => {
   if (!ui['start-date'].value || !ui['start-date'].validity.valid) return settingsError('start-date', 'Choose a valid starting date. Your current plan has not changed.');
   settingsError(null, '');
@@ -676,6 +706,7 @@ ui['end-date'].addEventListener('change', () => {
   if (!value) return settingsError('end-date', 'Choose an ending date. Your current plan has not changed.');
   setDayCount(daysBetween(trip.startDate, value) + 1, 'end-date');
 });
+// Đổi mốc chỉ tính lại khoảng cách/gợi ý; giữ các quán và điểm đã chọn.
 function originChanged() {
   save(); render();
   message(`Day ${activeDay + 1} starts from ${currentOrigin().name}. Your selected stops and restaurants stay unchanged. Distances and suggestions have been updated.`);
@@ -718,6 +749,7 @@ function addStop(spot, stop) {
   return true;
 }
 
+// SỰ KIỆN THÊM ĐIỂM: preventDefault ngăn form tải lại trang; chuyển dữ liệu form cho addStop.
 document.querySelector('#add-food').addEventListener('submit', (event) => {
   event.preventDefault();
   const food = byId.get(ui['food-choice'].value);
@@ -763,6 +795,7 @@ document.querySelector('#add-custom').addEventListener('submit', (event) => {
   }
 });
 
+// Thử sao chép bằng Clipboard API; nếu trình duyệt từ chối thì hiện ô để người dùng tự copy.
 async function copyShareLink() {
   const url = shareUrl(trip);
   ui['share-fallback'].hidden = true;
@@ -777,6 +810,7 @@ async function copyShareLink() {
   }
 }
 
+// Tạo chuỗi ICS của các ngày có điểm, tạo URL Blob tạm để tải, rồi giải phóng URL đó.
 function downloadCalendar() {
   const days = plannedDays();
   if (!days.length) return message('Add at least one stop before exporting.');
@@ -804,6 +838,7 @@ ui['open-library'].addEventListener('click', () => {
   ui['plan-library'].scrollIntoView({ block: 'start' });
   ui['plan-name'].focus({ preventScroll: true });
 });
+// Lưu một bản lịch có tên trong thư viện, tách với cơ chế tự lưu lịch đang sửa.
 document.querySelector('#save-plan').addEventListener('submit', (event) => {
   event.preventDefault();
   if (!trip.days.slice(0, trip.dayCount).some((day) => day.stops.length)) return message('Add at least one stop before saving a plan.');
@@ -824,6 +859,7 @@ document.querySelector('#new-plan').addEventListener('click', () => {
     confirmChange('Start a new plan?', 'This clears the plan you are editing. Save it first if you want to keep a named copy. You can also undo after starting over.', 'Start new plan', start);
   } else start();
 });
+// Lấy điểm của ngày hiện tại theo thứ tự hiển thị để tạo tour dùng lại.
 document.querySelector('#save-tour').addEventListener('submit', (event) => {
   event.preventDefault();
   updateLibrary(() => {
@@ -850,6 +886,7 @@ function applySharedTrip() {
 }
 
 try {
+  // KHỞI TẠO: đợi danh mục từ API rồi mới đọc lựa chọn trong URL và bật form.
   spots = await loadSpots();
   byId = new Map(spots.map((spot) => [spot.id, spot]));
   const sharedNotice = applySharedTrip();
@@ -859,6 +896,7 @@ try {
   addOptions(ui['food-choice'], spots.filter((spot) => spot.kind === 'food'),
     (spot) => saved.has(spot.id) ? `♥ ${spot.name}` : spot.name);
   addOptions(ui['place-choice'], spots.filter((spot) => spot.kind === 'place'), (spot) => spot.name);
+  // Link từ Food/Places chỉ điền sẵn lựa chọn; link tour có thể áp dụng ngay nếu ngày đầu trống.
   const params = new URLSearchParams(location.search);
   if (byId.get(params.get('food'))?.kind === 'food') ui['food-choice'].value = params.get('food');
   if (byId.get(params.get('place'))?.kind === 'place') ui['place-choice'].value = params.get('place');
@@ -873,6 +911,7 @@ try {
     if (selected && !currentStops().length) useTour(selected);
     else if (selected) message(`Day 1 already has stops. Use the ${selected.title} button to replace them.`);
   }
+  // Bỏ inert sau khi tải thành công để các nút không bị thao tác khi thiếu dữ liệu.
   for (const id of ['trip-setup', 'planner-workspace', 'plan-library']) document.getElementById(id).inert = false;
 } catch (error) {
   document.getElementById('planner-error').hidden = false;

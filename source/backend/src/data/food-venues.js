@@ -1,4 +1,8 @@
 /**
+ * LIÊN KẾT MÓN VÀ QUÁN: khóa ngoài là spotId của món; giá trị là danh sách quán phục vụ món đó.
+ * venueId xác định quán được chọn trong lịch; lat/lng dùng để ước tính và sắp quán gần trước.
+ */
+/**
  * Quán ăn gợi ý cho từng món. Mỗi quán là một địa điểm riêng, không phải
  * một "địa chỉ của món ăn". Tọa độ được làm tròn để chỉ xếp gần/xa tương đối;
  * Google Maps mới là nơi xem đường đi thực tế.

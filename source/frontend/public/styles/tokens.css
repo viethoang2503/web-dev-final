@@ -1,12 +1,9 @@
-/* ==========================================================================
-   Hanoi Local - design tokens (SET-03)
-   Single source of truth for colour, type, spacing, radius and motion.
-   Values come from docs/01-design-style.md. Do not hard-code these anywhere
-   else; page CSS must reference the variables.
-   ========================================================================== */
+/* BIẾN THIẾT KẾ CHUNG: :root khai báo màu, font, khoảng cách và kích thước.
+Dùng var(--tên-biến) giúp thay giao diện đồng bộ; clamp(min, linh-hoạt, max) giới hạn cỡ chữ theo màn hình. */
+/* Các file CSS khác dùng var(...) để lấy các giá trị thiết kế bên dưới. */
 
 :root {
-  /* --- Colour: core palette (Design Style section 4) --------------------- */
+  /* --- Màu cơ bản của giao diện --------------------- */
   --color-paper: #fcfcf8;
   --color-surface: #ffffff;
   --color-ink: #111111;
@@ -18,14 +15,14 @@
   --color-success: #1e7a46;
   --color-error: #b42318;
 
-  /* Derived shades. Kept few on purpose: no gradients, no glass effects. */
+  /* Các sắc độ bổ sung cho trạng thái hover, nền phụ và lớp phủ. */
   --color-ink-soft: #2b2d2b;
   --color-red-dark: #b32029;
   --color-blue-dark: #054aa8;
   --color-paper-sunken: #f4f4ee;
   --color-overlay: rgb(17 17 17 / 55%);
 
-  /* --- Semantic roles --------------------------------------------------- */
+  /* --- Gán màu theo vai trò: nền, chữ, viền, hành động --------------------------------------------------- */
   --bg-page: var(--color-paper);
   --bg-raised: var(--color-surface);
   --bg-sunken: var(--color-paper-sunken);
@@ -38,7 +35,7 @@
   --accent-meta: var(--color-jade);
   --focus-ring: var(--color-blue);
 
-  /* --- Typography (Design Style section 5) ------------------------------ */
+  /* --- Kiểu chữ, độ đậm và cỡ chữ ------------------------------ */
   --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
   --font-body: 'Manrope', 'Helvetica Neue', Arial, sans-serif;
 
@@ -48,14 +45,14 @@
   --weight-bold: 700;
   --weight-black: 800;
 
-  /* Fluid where the spec asks for it, fixed where the spec fixes it. */
+  /* clamp cho cỡ chữ linh hoạt có giới hạn; các cỡ còn lại dùng rem cố định. */
   --text-hero: clamp(3.2rem, 7vw, 7rem);
   --text-section: clamp(2rem, 4vw, 3rem);
   --text-card-title: clamp(1.25rem, 1.6vw, 1.5rem);
   --text-body-lg: clamp(1.05rem, 1.2vw, 1.25rem);
   --text-body: 1rem;
-  --text-label: 0.875rem; /* never smaller than 14px */
-  --text-meta: 0.75rem; /* secondary information only */
+  --text-label: 0.875rem; /* 14px khi cỡ chữ gốc là 16px */
+  --text-meta: 0.75rem; /* chỉ dành cho thông tin phụ */
 
   --leading-hero: 0.94;
   --leading-tight: 1.1;
@@ -64,12 +61,12 @@
 
   --tracking-tight: -0.02em;
   --tracking-normal: 0;
-  --tracking-wide: 0.08em; /* short eyebrow labels only */
+  --tracking-wide: 0.08em; /* chỉ dành cho nhãn ngắn phía trên tiêu đề */
 
   --measure-body: 65ch;
   --measure-narrow: 45ch;
 
-  /* --- Spacing scale: 8 12 16 24 32 48 64 96 128 ------------------------ */
+  /* --- Thang khoảng cách dùng chung (px ở cỡ chữ gốc) ------------------------ */
   --space-1: 0.5rem; /* 8 */
   --space-2: 0.75rem; /* 12 */
   --space-3: 1rem; /* 16 */
@@ -80,35 +77,35 @@
   --space-8: 6rem; /* 96 */
   --space-9: 8rem; /* 128 */
 
-  /* --- Layout ----------------------------------------------------------- */
+  /* --- Giới hạn bố cục và khoảng đệm ----------------------------------------------------------- */
   --container-max: 1440px;
-  --container-pad: 1.25rem; /* mobile 20px, raised at breakpoints below */
-  --utility-bar-height: 2.25rem; /* 36px minimum */
-  --header-height: 5.25rem; /* 84px, grows to 92px on wide desktop */
-  --hero-min-height: 42.5rem; /* 680px, not tied to 100vh */
+  --container-pad: 1.25rem; /* 20px ban đầu, tăng tại các mốc màn hình bên dưới */
+  --utility-bar-height: 2.25rem; /* tối thiểu 36px */
+  --header-height: 5.25rem; /* 84px, tăng thành 92px ở desktop rộng */
+  --hero-min-height: 42.5rem; /* 680px, không phụ thuộc chiều cao màn hình */
 
-  /* --- Radius and borders ---------------------------------------------- */
+  /* --- Bo góc và độ dày đường viền ---------------------------------------------- */
   --radius-none: 0;
   --radius-sm: 0.25rem;
   --radius-md: 0.75rem;
-  --radius-lg: 1rem; /* 16px ceiling from the spec */
+  --radius-lg: 1rem; /* bo góc 16px */
   --radius-pill: 999px;
   --border-width: 1px;
   --border-strong: 2px;
 
-  /* --- Elevation: minimal by design, borders do most of the work ------- */
+  /* --- Đổ bóng để phân biệt lớp nổi ------- */
   --shadow-none: none;
   --shadow-card: 0 1px 2px rgb(17 17 17 / 5%);
   --shadow-raised: 0 8px 24px rgb(17 17 17 / 10%);
   --shadow-overlay: 0 16px 48px rgb(17 17 17 / 18%);
 
-  /* --- Controls (Design Style section 8) ------------------------------- */
-  --control-height: 3rem; /* 48px minimum */
-  --touch-target: 2.75rem; /* 44px minimum */
+  /* --- Kích thước điều khiển và viền focus ------------------------------- */
+  --control-height: 3rem; /* tối thiểu 48px */
+  --touch-target: 2.75rem; /* tối thiểu 44px */
   --focus-ring-width: 3px;
   --focus-ring-offset: 2px;
 
-  /* --- Motion (Design Style section 9) --------------------------------- */
+  /* --- Thời gian và nhịp chuyển động --------------------------------- */
   --duration-underline: 150ms;
   --duration-control: 200ms;
   --duration-image: 240ms;
@@ -116,12 +113,12 @@
   --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* --- Aspect ratios (Design Style section 10) ------------------------- */
+  /* --- Tỷ lệ khung ảnh ------------------------- */
   --ratio-card: 4 / 3;
   --ratio-tile: 16 / 9;
   --ratio-portrait: 3 / 4;
 
-  /* --- Z-index ---------------------------------------------------------- */
+  /* --- Thứ tự chồng lớp ---------------------------------------------------------- */
   --z-header: 100;
   --z-overlay: 200;
   --z-drawer: 210;
@@ -129,7 +126,7 @@
   --z-toast: 300;
 }
 
-/* Container padding grows with the viewport: 20 -> 32 -> 64px. */
+/* Tăng khoảng đệm hai bên khi màn hình rộng hơn: 20 → 32 → 64px. */
 @media (min-width: 768px) {
   :root {
     --container-pad: 2rem;
@@ -143,7 +140,7 @@
   }
 }
 
-/* Honour the OS setting instead of animating anyway (section 9). */
+/* Giảm thời gian hiệu ứng khi người dùng bật chế độ giảm chuyển động. */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --duration-underline: 1ms;

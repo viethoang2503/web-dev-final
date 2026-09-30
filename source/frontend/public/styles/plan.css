@@ -1,3 +1,5 @@
+/* CSS TRANG LẬP LỊCH: cấu hình → tab ngày/bảng chọn → dòng thời gian → thư viện → bản in.
+Grid chia cột lớn, Flex sắp nhóm nút; các class khớp với phần tử tạo trong plan.page.js. */
 /* Plan: CSS riêng, không ảnh hưởng các trang khác.
    Desktop 2 cột, không cuộn lồng nhau. Góc 4px cho điều khiển, khối nội dung vuông. */
 .planner-page { --accent-action: var(--color-red-dark); --focus-ring: var(--color-red-dark); }
@@ -168,6 +170,7 @@
 #confirm-change p { color: var(--text-secondary); }
 .confirm-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
 .print-view { display: none; }
+/* Khi in chỉ hiện print-view, ẩn form/menu; break-inside hạn chế cắt một điểm giữa hai trang giấy. */
 @media print {
   .planner-page { min-width: 0; background: white; }
   .planner-page > :not(.print-view) { display: none !important; }

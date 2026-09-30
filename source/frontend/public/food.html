@@ -1,18 +1,22 @@
 <!doctype html>
+<!-- Trang món ăn: food.page.js gắn sự kiện tìm kiếm, chọn mốc xuất phát và dựng danh sách quán. -->
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <!-- UTF-8 hỗ trợ tiếng Việt; viewport quy định kích thước vùng hiển thị theo thiết bị. -->
+    <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Eat & drink — Hanoi Local</title>
   <meta name="description" content="Discover Hanoi dishes and compare real restaurants near your starting point." />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/styles/fonts.css" />
+  <!-- Nạp font → biến thiết kế → CSS nền → CSS riêng; quy tắc phía sau có thể ghi đè phía trước. -->
+    <link rel="stylesheet" href="/styles/fonts.css" />
   <link rel="stylesheet" href="/styles/tokens.css" />
   <link rel="stylesheet" href="/styles/base.css" />
   <link rel="stylesheet" href="/styles/guide.css" />
 </head>
 <body class="guide-page">
 <a class="skip-link" href="#main">Skip to content</a>
+<!-- Điều hướng chung giữa bốn trang; aria-current đánh dấu trang đang mở. -->
 <header class="site-header">
       <div class="utility-bar"><div class="container utility-bar__inner">Hanoi travel guide</div></div>
       <div class="container site-header__inner">
@@ -42,9 +46,11 @@
     <label>Starting point<select id="food-origin" class="input"></select></label>
     <p>Distance is a straight-line estimate. Google Maps gives the actual walking route.</p>
   </section>
+  <!-- role=status đọc thông báo số kết quả khi JavaScript cập nhật; danh sách bên dưới ban đầu trống. -->
   <p id="food-count" class="guide-count" role="status">Loading dishes...</p>
   <div id="food-list" class="food-list"></div>
 </main>
 <footer class="guide-footer"><div class="container"><strong>Hanoi Local</strong><p>Discover food, see the city and plan your days in Hanoi.</p></div></footer>
+<!-- Module cho phép import các tiện ích dùng chung và chạy sau khi HTML được phân tích. -->
 <script type="module" src="/scripts/pages/food.page.js"></script>
 </body></html>

@@ -1,3 +1,7 @@
+/**
+ * TRANG ĐỊA ĐIỂM: lọc danh mục kind=place, tìm theo tên/nhóm/quận và dựng thẻ bằng DOM.
+ * Mỗi thẻ hiển thị thời gian tham quan, vé và link sang Google Maps hoặc trang Plan.
+ */
 import { loadSpots, mapsSearch } from '../shared/guide.js';
 import { el, link, picture } from '../shared/ui.js';
 
@@ -6,6 +10,7 @@ const grid = document.querySelector('#places-list');
 const count = document.querySelector('#places-count');
 let places = [];
 
+// Tìm chuỗi nhập trong tên, nhóm hoặc quận (không phân biệt hoa thường), rồi dựng lại danh sách.
 function render() {
   const query = search.value.trim().toLocaleLowerCase('vi');
   const shown = places.filter((spot) => `${spot.name} ${spot.category} ${spot.district}`.toLocaleLowerCase('vi').includes(query));
@@ -18,6 +23,7 @@ function render() {
     copy.append(el('p', 'eyebrow', spot.category), el('h2', '', spot.name), el('p', '', spot.shortDescription));
     copy.append(el('p', 'guide-card__meta', `${spot.district} · ${spot.durationMinutes} minutes · ${spot.admission === 0 ? 'Free entry' : `${Number(spot.admission).toLocaleString('en-US')} VND`}`));
     const actions = el('div', 'guide-card__actions');
+    // Query ?place=... chỉ chọn sẵn địa điểm ở Plan; người dùng vẫn bấm nút thêm để đưa vào lịch.
     actions.append(link('View on Maps', mapsSearch(spot.name, spot.address)), link('Add to plan', `/plan.html?place=${encodeURIComponent(spot.id)}`, 'button button--primary'));
     copy.append(actions);
     card.append(copy);
@@ -26,6 +32,7 @@ function render() {
 }
 
 search.addEventListener('input', render);
+// Sau khi tải và dựng thẻ, hash #id giúp cuộn tới địa điểm được chọn từ trang chủ.
 try {
   places = (await loadSpots()).filter((spot) => spot.kind === 'place');
   render();

@@ -1,8 +1,11 @@
 /**
- * Creates the database from schema.sql.
- *
- *   npm run db:init            apply the schema (safe to re-run)
- *   npm run db:init -- --fresh delete the database file first
+ * KHỞI TẠO CẤU TRÚC: đọc schema.sql để tạo bảng/chỉ mục còn thiếu, bổ sung tọa độ cho DB cũ.
+ * Khởi động server chỉ tạo cấu trúc; muốn có dữ liệu mẫu cần chạy db:seed.
+ * Nhánh fresh xóa file database và file phụ; chỉ dùng khi chủ động muốn tạo lại dữ liệu.
+ */
+/**
+ * npm run db:init áp dụng schema và có thể chạy lại.
+ * npm run db:init -- --fresh xóa database trước khi tạo mới.
  */
 import { readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
@@ -13,9 +16,8 @@ import { getDb, closeDb } from './connection.js';
 const here = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Deleting the database file while the server is running is a trap: the server
- * keeps writing to the unlinked file, so it appears to work while every other
- * process reads an empty database. Refuse instead of failing silently.
+ * Kiểm tra server trước khi chạy --fresh bằng dòng lệnh.
+ * Nếu server còn giữ kết nối với file cũ thì không xóa, tránh các tiến trình nhìn thấy dữ liệu khác nhau.
  */
 async function assertServerNotRunning() {
   try {
@@ -31,7 +33,7 @@ async function assertServerNotRunning() {
       process.exit(1);
     }
   } catch {
-    // Nothing listening, or it did not answer in time. Safe to continue.
+    // Không nhận được phản hồi thành công trong thời gian chờ; tiếp tục nhánh tạo mới.
   }
 }
 
@@ -58,7 +60,7 @@ export function initDatabase({ fresh = false } = {}) {
   return db;
 }
 
-// Only run when executed directly, not when imported by the server.
+// Chỉ chạy khối lệnh này khi gọi file trực tiếp; import từ server không chạy khối này.
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const fresh = process.argv.includes('--fresh');
   if (fresh) await assertServerNotRunning();

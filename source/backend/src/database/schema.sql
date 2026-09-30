@@ -1,6 +1,8 @@
 -- Bảng catalogue công khai. Favorites và lịch dùng localStorage trong trình duyệt.
 -- File SQLite cũ có thể còn bảng tài khoản lịch sử; chạy schema này không xóa dữ liệu đó.
 
+-- Mỗi hàng là một món hoặc địa điểm; PRIMARY KEY giữ id duy nhất.
+-- NOT NULL bắt buộc dữ liệu; CHECK chặn giá trị ngoài miền cho phép ngay tại database.
 CREATE TABLE IF NOT EXISTS spots (
   id                TEXT PRIMARY KEY,
   kind              TEXT NOT NULL CHECK (kind IN ('food', 'place')),
@@ -25,5 +27,6 @@ CREATE TABLE IF NOT EXISTS spots (
   featured          INTEGER NOT NULL DEFAULT 0 CHECK (featured IN (0, 1))
 );
 
+-- Chỉ mục hỗ trợ tra cứu theo loại và trạng thái nổi bật, không tạo bản sao danh mục mới.
 CREATE INDEX IF NOT EXISTS idx_spots_kind ON spots (kind);
 CREATE INDEX IF NOT EXISTS idx_spots_featured ON spots (featured);

@@ -1,3 +1,5 @@
+/* BỐ CỤC HOME: chia cột bằng Grid, sắp ảnh collage và các khối giới thiệu.
+Trang này có min-width 1000px, chủ yếu phục vụ desktop; các giá trị clamp điều chỉnh trong giới hạn đó. */
 /* Home theo ảnh mẫu trong docs/assets. Food, Places và Plan dùng guide.css.
    Ảnh vuông góc; nút giữ bo góc nhỏ của bộ nhận diện. */
 
@@ -11,7 +13,7 @@
   --guide-brand-type: clamp(36px, 3.6vw, 56px);
   --guide-photo-height: clamp(360px, 30vw, 480px);
   --guide-caption-bg: rgb(17 17 17 / 88%);
-  min-width: 1000px; /* Fits a 1024px desktop including its scrollbar. */
+  min-width: 1000px; /* Giữ bố cục desktop, chừa chỗ thanh cuộn trong màn hình 1024px. */
   background: var(--color-surface);
 }
 
@@ -38,7 +40,7 @@
 .desktop-guide .button > span[aria-hidden] { font-size: 1.4em; line-height: 1; }
 .desktop-guide :is([id$="-guide"], [id$="-grid"], #planner) { scroll-margin-top: 144px; }
 
-/* Hero: the whole composition, including the category heading, fits a laptop. */
+/* Khối mở đầu: chia cột nội dung và ảnh để vừa vùng nhìn trên laptop. */
 .home-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
@@ -54,7 +56,7 @@
 .home-hero__actions { display: flex; gap: var(--space-3); }
 .home-hero__actions .button { min-height: 58px; padding-inline: var(--space-4); font-size: clamp(16px, 1.35vw, 20px); }
 
-/* Each photograph owns a clear part of the grid. Only the lower edges overlap. */
+/* Mỗi ảnh chiếm một vùng trong lưới 12 cột và 12 hàng; object-fit giữ ảnh phủ đầy khung. */
 .home-collage {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -77,7 +79,7 @@
 .home-collage__food img { object-position: center 55%; }
 .home-collage__heritage { grid-area: 8 / 8 / 13 / 13; margin-top: var(--space-2); }
 
-/* Direct entry points immediately after the hero, as in the supplied mockup. */
+/* Ba thẻ dẫn thẳng tới các chức năng chính sau khối mở đầu. */
 .section__head { display: grid; gap: var(--space-2); margin-block-end: var(--space-4); }
 .section__head--row { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
 .section__head p { margin-block-start: var(--space-2); color: var(--text-secondary); }
@@ -96,7 +98,7 @@
 .interest:hover img { transform: scale(1.035); }
 .interest:hover .interest__label { background: var(--color-ink); }
 
-/* Open image-led cards: metadata stays readable, favourite buttons still work. */
+/* Bố cục thẻ ảnh và thông tin phụ; một số selector dành cho cấu trúc thẻ cũ. */
 .guide-section { padding-block: var(--space-6); }
 .desktop-guide .card-grid { align-items: start; gap: var(--space-6) var(--space-4); }
 .desktop-guide .card { border: 0; border-radius: 0; box-shadow: none; background: transparent; overflow: visible; }
@@ -114,7 +116,7 @@
 .home-places-grid .card:first-child .card__media { aspect-ratio: 1.25; }
 .home-places-grid .card:not(:first-child) { margin-top: var(--space-6); }
 
-/* An unboxed planner, not a second promotional photo wall. */
+/* Khối giới thiệu lập lịch với ba buổi trong ngày. */
 .day-plan { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); padding-block: var(--space-7); }
 .day-plan__copy { display: grid; gap: var(--space-4); justify-items: start; }
 .day-plan h2 { font-size: clamp(40px, 4.2vw, 64px); line-height: 1.05; }
@@ -124,7 +126,7 @@
 .day-plan__slots p { margin-block-start: var(--space-1); color: var(--text-secondary); }
 .day-plan__slots h3 { color: var(--accent-meta); }
 
-/* Catalogue covers: a magazine opening before the working search/filter UI. */
+/* Các kiểu bìa danh mục của bố cục cũ; Food và Places hiện dùng guide.css. */
 .catalogue-cover { display: grid; align-items: center; gap: var(--space-5); padding-block: var(--space-5) var(--space-7); }
 .catalogue-cover--food { grid-template-columns: 1fr 1.05fr 0.65fr; }
 .catalogue-cover__copy { display: grid; justify-items: start; gap: var(--space-4); }
@@ -169,7 +171,7 @@ main[data-kind='place'] .card:nth-child(6n + 1) .card__media { aspect-ratio: 4 /
 main[data-kind='place'] .card:nth-child(6n + 2) { grid-column: span 2; margin-top: 0; }
 main[data-kind='place'] .card:nth-child(6n + 2) .card__media { aspect-ratio: 2.2; }
 
-/* The supplied mockup is light with a dark utility footer. */
+/* Chân trang nền tối tương phản với nội dung nền sáng. */
 .desktop-guide .site-footer { margin-top: var(--space-6); }
 .desktop-guide .site-footer .brand { font-size: 36px; }
 @media (prefers-reduced-motion: reduce) {

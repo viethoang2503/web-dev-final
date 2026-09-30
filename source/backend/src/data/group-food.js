@@ -1,3 +1,7 @@
+/**
+ * NỘI DUNG BỔ SUNG: các món nhóm lựa chọn được ghép vào danh sách seed-data.js.
+ * Đây là dữ liệu biên soạn sẵn, không phải dữ liệu lấy trực tiếp từ website khi ứng dụng chạy.
+ */
 /** Món nhóm chọn trong https___HNlocalfood.docx, bổ sung ngày 29/09/2026.
  * File chỉ có tên và ảnh: phần mô tả ngắn do nhóm ứng dụng biên soạn lại.
  * Không tự đặt rating hay giờ mở cửa. Ảnh minh họa món, không phải ảnh của quán.

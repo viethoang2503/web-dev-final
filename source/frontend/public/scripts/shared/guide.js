@@ -1,3 +1,8 @@
+/**
+ * TIỆN ÍCH DÙNG CHUNG: tải API, đọc/ghi lịch và Favorites, xử lý ngày, khoảng cách và URL Maps.
+ * spot là món/địa điểm trong danh mục; venue là quán; stop là lựa chọn của khách trong một ngày.
+ * localStorage chỉ lưu trên trình duyệt hiện tại, không gửi lịch vào SQLite.
+ */
 /** Dữ liệu chung cho ba trang. Chỉ Favorites và lịch được lưu trên máy này. */
 const STORAGE_KEY = 'hanoi-local-trip-v2';
 const FAVORITES_KEY = 'hanoi-local-favorite-dishes-v2';
@@ -55,6 +60,7 @@ export const TOURS = [
   },
 ];
 
+// fetch gửi HTTP GET tới Express; await đợi phản hồi và tách mảng data khỏi JSON.
 export async function loadSpots() {
   const response = await fetch('/api/spots');
   if (!response.ok) throw new Error('Could not load the Hanoi guide. Please reload.');
@@ -62,6 +68,7 @@ export async function loadSpots() {
   return payload.data ?? [];
 }
 
+// Dữ liệu localStorage là chuỗi JSON; nếu hỏng hoặc sai dạng thì trả danh sách rỗng.
 export function readFavorites() {
   try {
     const value = JSON.parse(localStorage.getItem(FAVORITES_KEY));
@@ -69,6 +76,7 @@ export function readFavorites() {
   } catch { return []; }
 }
 
+// Set giúp mỗi món chỉ xuất hiện một lần; bấm lần nữa sẽ bỏ id khỏi tập yêu thích.
 export function toggleFavorite(id) {
   const current = new Set(readFavorites());
   current.has(id) ? current.delete(id) : current.add(id);
@@ -76,6 +84,7 @@ export function toggleFavorite(id) {
   return current.has(id);
 }
 
+// Lấy ngày theo giờ máy người dùng; đặt giữa trưa trước khi cộng ngày để tránh sát ranh giới ngày.
 function localDate(days = 0) {
   const date = new Date();
   date.setHours(12, 0, 0, 0);
@@ -104,6 +113,7 @@ export function isValidStop(stop) {
     (stop.kind !== 'custom' || (typeof stop.name === 'string' && stop.name.trim().length > 0));
 }
 
+// Lịch mặc định có một ngày trống, xuất phát từ Hồ Hoàn Kiếm.
 function defaultTrip() {
   return { startDate: localDate(), dayCount: 1, originId: 'hoan-kiem', days: [{ originId: null, stops: [] }] };
 }
@@ -126,6 +136,7 @@ export function normalizeTrip(saved) {
   };
 }
 
+// Đọc lịch cũ và chuẩn hóa; lần đầu truy cập hoặc JSON hỏng thì dùng lịch mặc định.
 export function readTrip() {
   try { return normalizeTrip(JSON.parse(localStorage.getItem(STORAGE_KEY))); } catch { return defaultTrip(); }
 }
@@ -141,12 +152,13 @@ export function pruneTrip(trip, validIds) {
   return removed;
 }
 
-/** Ngày (1-3) đang giữ điểm này, trừ ngày `exceptDay`; -1 nếu chưa có. */
+/** Chỉ số ngày (bắt đầu từ 0) đang chứa điểm này, bỏ qua exceptDay và ngày ẩn; -1 nếu không có. */
 export function dayUsingSpot(trip, spotId, exceptDay = -1) {
   return trip.days.findIndex((day, index) => index < trip.dayCount && index !== exceptDay &&
     day.stops.some((stop) => stop.spotId === spotId));
 }
 
+// localStorage chỉ nhận chuỗi nên cần JSON.stringify; lỗi ghi sẽ được phía gọi xử lý.
 export function saveTrip(trip) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(trip));
 }
@@ -165,12 +177,14 @@ export function ensureDays(trip, count) {
   while (trip.days.length < count) trip.days.push({ originId: null, stops: [] });
 }
 
+// Đổi ngày bắt đầu + chỉ số ngày thành nhãn dễ đọc trên tab của trang Plan.
 export function dateForDay(startDate, index) {
   const [year, month, day] = startDate.split('-').map(Number);
   const date = new Date(year, month - 1, day + index, 12);
   return new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'short' }).format(date);
 }
 
+// Ưu tiên mốc riêng của ngày, sau đó mốc chung của chuyến đi, cuối cùng là Hồ Hoàn Kiếm.
 export function originFor(trip, index) {
   return ORIGINS.find((item) => item.id === (trip.days[index]?.originId || trip.originId)) ?? ORIGINS[0];
 }
@@ -184,10 +198,12 @@ export function approxKm(a, b) {
   return 6371 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
 }
 
+// Sao chép mảng trước khi sort để không làm đổi thứ tự dữ liệu quán gốc.
 export function sortedVenues(food, origin) {
   return [...(food.venues ?? [])].sort((a, b) => approxKm(origin, a) - approxKm(origin, b));
 }
 
+// Tạo URL tìm kiếm theo tên/địa chỉ; encodeURIComponent giữ ký tự tiếng Việt an toàn trong URL.
 export function mapsSearch(name, address) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name}, ${address}`)}`;
 }
@@ -195,6 +211,7 @@ export function mapsSearch(name, address) {
 /** "Tên, địa chỉ, Hanoi, Vietnam", bỏ phần trống (điểm tự nhập có thể không có địa chỉ). */
 export const placeText = (name, address) => [name, address, 'Hanoi, Vietnam'].filter(Boolean).join(', ');
 
+// Tạo link chỉ đường đi bộ; Google Maps tính đường đi thực tế sau khi người dùng mở link.
 export function mapsDirections(origin, name, address) {
   const query = new URLSearchParams({
     api: '1', origin: placeText(origin.name, origin.address),
@@ -204,7 +221,6 @@ export function mapsDirections(origin, name, address) {
   return `https://www.google.com/maps/dir/?${query}`;
 }
 
-// Điểm tham quan lấy tọa độ từ API; thiếu dữ liệu thì tạm dùng Hồ Hoàn Kiếm.
 /**
  * Một tuyến Maps cho cả ngày: xuất phát từ `origin`, đi qua các điểm theo thứ tự.
  * `stops` là [{ name, address }]; Maps cho tối đa khoảng 9 điểm trung gian.
@@ -221,6 +237,7 @@ export function mapsRoute(origin, stops) {
   return `https://www.google.com/maps/dir/?${query}`;
 }
 
+// Món ăn dùng tọa độ quán đã chọn; địa điểm thiếu tọa độ thì dùng mốc Hồ Hoàn Kiếm.
 export function spotPoint(spot, venue) {
   if (venue) return venue;
   const { lat, lng } = Number.isFinite(spot.lat) && Number.isFinite(spot.lng) ? spot : ORIGINS[0];

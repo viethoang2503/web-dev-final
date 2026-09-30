@@ -1,6 +1,11 @@
+/**
+ * ĐIỀU KHIỂN GIAO DIỆN: đổi tab bảng chọn và mở hộp thoại xác nhận bằng phần tử dialog.
+ * Các hàm nhận callback để trang Plan quyết định thay đổi dữ liệu sau khi người dùng xác nhận.
+ */
 /** Điều khiển giao diện Plan; không đọc/ghi dữ liệu chuyến đi. */
 export function createPicker(root) {
   const buttons = [...root.querySelectorAll('[data-picker]')];
+  // Đổi bảng đang hiện cùng aria-selected/tabIndex; chỉ chuyển focus khi thao tác yêu cầu.
   function select(name, focus = false) {
     for (const button of buttons) {
       const active = button.dataset.picker === name;

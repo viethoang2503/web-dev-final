@@ -1,3 +1,5 @@
+/* THÀNH PHẦN TRANG CHỦ: nút, header, menu và footer.
+Tiền tố .desktop-guide giới hạn phạm vi áp dụng cho trang Home. */
 /* Thành phần chỉ dùng ở Home. Các trang danh mục dùng guide.css. */
 .desktop-guide .button {
   display: inline-flex;

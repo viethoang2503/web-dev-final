@@ -1,3 +1,8 @@
+/**
+ * KIỂM THỬ LOGIC: dùng dữ liệu nhỏ đã biết kết quả, gọi hàm rồi so sánh bằng assert.
+ * Các nhóm bên dưới kiểm tra xếp giờ, cảnh báo, đổi thứ tự, chia sẻ, xuất lịch, thư viện và tour.
+ * Nếu kết quả khác mong đợi, assert ném lỗi và lệnh kết thúc thất bại.
+ */
 /** Unit tests cho logic xếp lịch. Không cần server hay trình duyệt. */
 import assert from 'node:assert/strict';
 import { DAY_END, MAX_STOPS_PER_DAY, insertStopByTime, moveStop, slotForTime, openingWarning, optimizeOrder, scheduleDay, suggestNearby, travelMinutes } from '../source/frontend/public/scripts/shared/schedule.js';

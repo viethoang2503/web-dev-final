@@ -1,3 +1,8 @@
+/**
+ * ĐIỂM BẮT ĐẦU BACKEND: npm start chạy file này.
+ * Luồng yêu cầu: /api → router → service → SQLite → JSON; các URL trang web → file tĩnh.
+ * Frontend và API cùng địa chỉ/cổng nên trình duyệt gọi được /api/spots bằng đường dẫn tương đối.
+ */
 /** Một server phục vụ trang tĩnh và API món ăn/địa điểm trên cùng cổng. */
 import express from 'express';
 import { config } from './config/environment.js';
@@ -27,6 +32,7 @@ app.use(
   })
 );
 
+// Đặt bộ xử lý lỗi sau các route để nhận lỗi được chuyển xuống từ những bước trước.
 app.use(errorHandler);
 
 const server = app.listen(config.port, () => {
@@ -34,6 +40,7 @@ const server = app.listen(config.port, () => {
   console.log(`[server] Database: ${config.databasePath}`);
 });
 
+// Khi dừng tiến trình, ngừng nhận kết nối và chờ server đóng trước khi thoát.
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => {
     server.close(() => process.exit(0));

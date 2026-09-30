@@ -1,23 +1,12 @@
 /**
- * Image optimisation for PERF-01 / docs/05 section 5.
- *
- *   node scripts/optimize-images.mjs <source-folder> [--dry-run]
- *
- * Takes the original JPG/PNG photos, writes WebP versions into the right
- * folders under source/frontend/public/assets/images/, and prints a before/after table ready to
- * paste into docs/05.
- *
- * Uses `sips`, which ships with macOS, so there is nothing to install. If
- * `cwebp` is on PATH it is preferred, because it produces smaller files.
- *
- * Naming: the output file name is the input file name with a .webp extension,
- * so a source file named food-pho-bo.jpg becomes
- * source/frontend/public/assets/images/spots/food-pho-bo.webp and is picked up automatically by
- * the seed data. Files are routed by their prefix:
- *
- *   food-*, place-*  -> assets/images/spots/
- *   hero-*           -> assets/images/hero/     (prefix removed)
- *   tile-*           -> assets/images/tiles/    (prefix removed)
+ * CÔNG CỤ TỐI ƯU ẢNH: phân loại theo tiền tố tên file rồi chuyển sang WebP hoặc AVIF.
+ * Ưu tiên cwebp nếu có; nếu không mặc định dùng sips để tạo AVIF.
+ * --dry-run chỉ in kế hoạch, không tạo ảnh; bảng cuối so dung lượng trước/sau.
+ */
+/**
+ * Chạy: node scripts/optimize-images.mjs <thư-mục-ảnh> [--dry-run].
+ * food-/place- → spots; hero- → hero; tile- → tiles.
+ * Tiền tố hero-/tile- bị bỏ khỏi tên đích; phần mở rộng phụ thuộc định dạng được chọn.
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, statSync } from 'node:fs';
@@ -31,7 +20,7 @@ const args = process.argv.slice(2);
 const sourceDir = args.find((arg) => !arg.startsWith('--'));
 const dryRun = args.includes('--dry-run');
 
-/** Long edge per role, so a card image is not a 4000px original. */
+/** Kích thước đích theo vai trò ảnh; convert dùng giá trị này cho công cụ chuyển đổi. */
 const MAX_EDGE = {
   spots: 1200,
   hero: 1600,
@@ -62,12 +51,9 @@ const hasCwebp = (() => {
 })();
 
 /**
- * Output format.
- *
- * cwebp writes WebP. macOS `sips` can read WebP but not write it, so without
- * cwebp the script writes AVIF, which sips does support and which is usually
- * smaller anyway. Either is fine: the app references images without an
- * extension and source/backend/src/middleware/image-resolver.middleware.js serves whichever exists.
+ * cwebp tạo WebP; khi không có cwebp thì script mặc định chọn AVIF qua sips.
+ * Có thể truyền --format=webp hoặc --format=avif.
+ * Middleware phục vụ được ảnh không có đuôi theo định dạng đang tồn tại.
  */
 const requested = args.find((arg) => arg.startsWith('--format='))?.split('=')[1];
 const format = requested ?? (hasCwebp ? 'webp' : 'avif');
@@ -82,7 +68,7 @@ if (format === 'webp' && !hasCwebp) {
   process.exit(1);
 }
 
-/** Where does this file belong, and what should it be called? */
+/** Xác định thư mục và tên ảnh đích từ tiền tố của tên nguồn. */
 function route(fileName) {
   const base = path.basename(fileName, path.extname(fileName));
 
@@ -108,7 +94,7 @@ function convert(source, destination, maxEdge) {
     return;
   }
 
-  // -Z resizes on the long edge, keeping the aspect ratio.
+  // Tùy chọn -Z của sips giới hạn cạnh dài, giữ tỷ lệ ảnh.
   execFileSync(
     'sips',
     ['-Z', String(maxEdge), '-s', 'format', 'avif', '-s', 'formatOptions', String(QUALITY), source, '--out', destination],
@@ -155,7 +141,7 @@ for (const file of sources) {
   rows.push({ file, destination: path.relative(projectRoot, destination), before, after });
 }
 
-/* --- report ------------------------------------------------------------ */
+/* Tổng hợp dung lượng từng ảnh và mức giảm để đưa vào báo cáo. */
 
 console.log(`| Asset | Before | After ${format.toUpperCase()} | Reduction |`);
 console.log('|---|---:|---:|---:|');

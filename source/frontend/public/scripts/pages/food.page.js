@@ -1,3 +1,7 @@
+/**
+ * TRANG MÓN ĂN: tải danh mục một lần, tìm theo tên ngay trong trình duyệt và xếp quán theo mốc xuất phát.
+ * Save dish lưu id món vào localStorage; Add to plan chuyển món/quán qua URL sang trang lập lịch.
+ */
 import { ORIGINS, approxKm, loadSpots, mapsDirections, readFavorites, readTrip, saveTrip, sortedVenues, toggleFavorite } from '../shared/guide.js';
 import { el, link, picture } from '../shared/ui.js';
 
@@ -14,6 +18,7 @@ for (const origin of ORIGINS) {
 }
 originSelect.value = readTrip().originId;
 
+// Lấy từ khóa và mốc xuất phát hiện tại, lọc món rồi thay danh sách thẻ cũ bằng kết quả mới.
 function renderFood() {
   const origin = ORIGINS.find((item) => item.id === originSelect.value) ?? ORIGINS[0];
   const searchText = search.value.trim().toLocaleLowerCase('vi');
@@ -35,6 +40,7 @@ function renderFood() {
     const fav = el('button', 'text-action', saved.has(food.id) ? '♥ Saved dish' : '♡ Save dish');
     fav.type = 'button';
     fav.setAttribute('aria-pressed', String(saved.has(food.id)));
+    // Đổi trạng thái yêu thích và nhãn nút tại chỗ, không cần tải lại trang.
     fav.addEventListener('click', () => {
       const active = toggleFavorite(food.id);
       fav.textContent = active ? '♥ Saved dish' : '♡ Save dish';
@@ -42,6 +48,7 @@ function renderFood() {
     });
     copy.append(fav, el('h3', 'guide-card__venues-title', 'Where to try it'));
     const venues = el('ol', 'venue-list');
+    // Mỗi món có nhiều quán; xếp gần trước và tạo hai link chỉ đường / chọn quán cho lịch.
     for (const venue of sortedVenues(food, origin)) {
       const row = el('li', 'venue-row');
       const actions = el('div', 'venue-row__actions');
@@ -63,6 +70,7 @@ function renderFood() {
   }));
 }
 
+// Lưu mốc xuất phát vào chuyến đi để trang Food và Plan dùng chung lựa chọn.
 originSelect.addEventListener('change', () => {
   const trip = readTrip();
   trip.originId = originSelect.value;
@@ -71,6 +79,7 @@ originSelect.addEventListener('change', () => {
 });
 search.addEventListener('input', renderFood);
 
+// Khởi tạo trang: chỉ gọi API một lần; thao tác tìm kiếm sau đó lọc mảng foods trong bộ nhớ.
 try {
   foods = (await loadSpots()).filter((spot) => spot.kind === 'food');
   renderFood();

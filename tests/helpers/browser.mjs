@@ -1,15 +1,12 @@
 /**
- * Minimal Chrome DevTools Protocol helper shared by the QA scripts.
- *
- * Uses the WebSocket client built into Node, so the test tooling needs no
- * npm dependency and works on any member's machine that has Chrome.
- *
- * Usage:
- *   await withPage('http://localhost:3000/', { width: 375 }, async (page) => {
- *     const value = await page.evaluate('document.title');
- *     await page.type('#filter-search', 'pho');
- *     const errors = page.errors();
- *   });
+ * CÔNG CỤ TEST TRÌNH DUYỆT: mở Chrome headless bằng profile tạm, kết nối qua WebSocket/CDP.
+ * Mỗi lệnh có id để ghép yêu cầu với phản hồi; page cung cấp evaluate, fill, click và key.
+ * Cuối mỗi ca kiểm thử đóng trình duyệt và xóa profile tạm, không dùng hồ sơ duyệt web cá nhân.
+ */
+/**
+ * Tiện ích Chrome DevTools Protocol dùng chung cho các bài QA.
+ * WebSocket có sẵn trong Node kết nối với Chrome; withPage nhận URL, cấu hình khung nhìn
+ * và callback chứa các thao tác cần kiểm thử.
  */
 import { spawn } from 'node:child_process';
 import { existsSync, mkdtempSync, rmSync } from 'node:fs';
@@ -24,7 +21,7 @@ const CHROME_CANDIDATES = [
   '/usr/bin/chromium',
 ];
 
-/** Port is offset per process so parallel runs do not collide. */
+/** Tính cổng từ pid để giảm khả năng các tiến trình test dùng trùng cổng. */
 const PORT = 9400 + (process.pid % 200);
 
 function findChrome() {
@@ -44,7 +41,7 @@ async function devtoolsUrl(timeoutMs = 15000) {
       const response = await fetch(`http://127.0.0.1:${PORT}/json/version`);
       if (response.ok) return (await response.json()).webSocketDebuggerUrl;
     } catch {
-      /* browser not ready yet */
+      /* trình duyệt chưa sẵn sàng, thử lại sau */
     }
     await wait(150);
   }
@@ -52,11 +49,8 @@ async function devtoolsUrl(timeoutMs = 15000) {
 }
 
 /**
- * Open one page, run the callback, always clean up the browser.
- *
- * @param {string} url
- * @param {{ width?: number, height?: number, settleMs?: number, beforeLoad?: string }} viewport
- * @param {(page: object) => Promise<any>} run
+ * Mở một trang, chạy callback kiểm thử và luôn dọn trình duyệt ở finally.
+ * viewport gồm width, height, settleMs và mã beforeLoad dùng mô phỏng lỗi.
  */
 export async function withPage(url, { width = 1440, height = 900, settleMs = 2200, beforeLoad = '' } = {}, run) {
   const userDataDir = mkdtempSync(path.join(tmpdir(), 'hanoi-local-chrome-'));
@@ -123,7 +117,7 @@ export async function withPage(url, { width = 1440, height = 900, settleMs = 220
     });
 
     const page = {
-      /** Evaluate an expression in the page and return the value. */
+      /** Chạy biểu thức trong ngữ cảnh trang web và lấy kết quả về Node. */
       async evaluate(expression) {
         const { result, exceptionDetails } = await send('Runtime.evaluate', {
           expression: `(() => { ${expression.includes('return') ? expression : `return (${expression});`} })()`,
@@ -136,7 +130,7 @@ export async function withPage(url, { width = 1440, height = 900, settleMs = 220
         return result.value;
       },
 
-      /** Set a field's value and fire the event the page listens for. */
+      /** Điền giá trị vào trường và phát sự kiện mà ứng dụng đang lắng nghe. */
       async fill(selector, value, eventName = 'input') {
         return page.evaluate(`
           const el = document.querySelector(${JSON.stringify(selector)});
@@ -159,7 +153,7 @@ export async function withPage(url, { width = 1440, height = 900, settleMs = 220
         `);
       },
 
-      /** Send a real key event to the focused element (Escape, Tab, Enter). */
+      /** Gửi sự kiện bàn phím thật tới phần tử đang được focus. */
       async key(key, code = key) {
         await send('Input.dispatchKeyEvent', {
           type: 'keyDown',
@@ -176,7 +170,7 @@ export async function withPage(url, { width = 1440, height = 900, settleMs = 220
         await wait(120);
       },
 
-      /** PNG screenshot as base64, handy for eyeballing a state under review. */
+      /** Chụp ảnh PNG dạng base64 để kiểm tra trạng thái giao diện khi cần. */
       async screenshot() {
         const { data } = await send('Page.captureScreenshot', { format: 'png' });
         return data;
@@ -184,7 +178,7 @@ export async function withPage(url, { width = 1440, height = 900, settleMs = 220
 
       wait,
 
-      /** Script errors and console errors, with missing images separated. */
+      /** Thu lỗi script/console và tách riêng lỗi tài nguyên ảnh bị thiếu. */
       errors() {
         const entries = events
           .filter((e) => e.method === 'Log.entryAdded' && e.params.entry.level === 'error')
@@ -214,9 +208,8 @@ export async function withPage(url, { width = 1440, height = 900, settleMs = 220
     socket?.close();
     chrome.kill('SIGKILL');
 
-    // Chrome can still be flushing its profile when the process dies, so the
-    // directory may briefly refuse to go. Retry, and never fail the run over
-    // a leftover temp folder.
+    // Chrome có thể chưa giải phóng hết file profile; thử xóa lại vài lần.
+    // Nếu vẫn lỗi thì chỉ cảnh báo, không làm sai kết quả kiểm thử ứng dụng.
     await wait(150);
     try {
       rmSync(userDataDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
@@ -226,7 +219,7 @@ export async function withPage(url, { width = 1440, height = 900, settleMs = 220
   }
 }
 
-/* --- tiny assertion helpers used by the QA scripts --------------------- */
+/* Ghi nhận từng kiểm tra đạt/trượt và tổng kết mã thoát của bài QA. */
 
 let passed = 0;
 let failed = 0;

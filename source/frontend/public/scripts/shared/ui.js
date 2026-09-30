@@ -1,3 +1,7 @@
+/**
+ * TẠO HTML BẰNG JAVASCRIPT: el tạo phần tử, link tạo liên kết, picture tạo thẻ img.
+ * Nội dung chữ đi qua textContent nên được hiển thị như văn bản, không được phân tích thành HTML.
+ */
 /** Tạo DOM an toàn: dữ liệu từ API đi qua textContent. */
 export function el(tag, className = '', text = '') {
   const item = document.createElement(tag);
@@ -6,6 +10,7 @@ export function el(tag, className = '', text = '') {
   return item;
 }
 
+// Link HTTPS mở tab mới; noopener ngăn trang đích truy cập window.opener.
 export function link(text, href, className = '') {
   const item = el('a', className, text);
   item.href = href;
@@ -16,6 +21,7 @@ export function link(text, href, className = '') {
   return item;
 }
 
+// Lazy loading trì hoãn tải ảnh ngoài vùng nhìn; width/height cung cấp kích thước trước khi ảnh tải xong.
 export function picture(src, alt, className = '') {
   const item = el('img', className);
   item.src = src;

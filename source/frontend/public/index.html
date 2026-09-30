@@ -1,6 +1,8 @@
 <!doctype html>
+<!-- Trang chủ giới thiệu Hà Nội, tour mẫu và các mục nổi bật; home.page.js điền dữ liệu vào các khối data-role. -->
 <html lang="en">
   <head>
+    <!-- UTF-8 hỗ trợ tiếng Việt; viewport quy định kích thước vùng hiển thị theo thiết bị. -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Hanoi Local — Discover Hanoi like a local</title>
@@ -11,6 +13,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Nạp font → biến thiết kế → CSS nền → CSS riêng; quy tắc phía sau có thể ghi đè phía trước. -->
     <link rel="stylesheet" href="/styles/fonts.css" />
     <link rel="stylesheet" href="/styles/tokens.css" />
     <link rel="stylesheet" href="/styles/base.css" />
@@ -22,9 +25,10 @@
     <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- ==================================================================
-         Section A — utility bar and navigation (UI-01)
+         Phần A — thanh thông tin và điều hướng
          ================================================================== -->
-    <header class="site-header">
+    <!-- Điều hướng chung giữa bốn trang; aria-current đánh dấu trang đang mở. -->
+<header class="site-header">
       <div class="utility-bar"><div class="container utility-bar__inner">Hanoi travel guide</div></div>
       <div class="container site-header__inner">
         <a class="brand" href="/"><span class="brand__hanoi">Hanoi</span><span class="brand__local">Local</span></a>
@@ -40,6 +44,7 @@
     </header>
 
     <main id="main">
+      <!-- Khu mở đầu: giới thiệu sản phẩm, nút đi nhanh và cụm bốn ảnh. -->
       <section class="home-hero container" aria-labelledby="hero-heading">
         <div class="home-hero__copy">
           <p class="eyebrow">A kinder, more curious Hanoi</p>
@@ -49,7 +54,7 @@
             <a class="button button--primary" href="/places.html" id="hero-explore-btn">Explore places <span aria-hidden="true">→</span></a>
             <a class="button button--secondary" href="/food.html" id="hero-food-btn">Find local food <span aria-hidden="true">→</span></a>
           </div>
-          <!-- Data hooks used by home.js; not part of the visual hero. -->
+          <!-- Các ô thống kê cũ đang ẩn; home.page.js hiện không điền dữ liệu vào các ô này. -->
           <dl hidden>
             <div><dt>Food picks</dt><dd data-role="stat-food"></dd></div>
             <div><dt>Places</dt><dd data-role="stat-places"></dd></div>
@@ -72,6 +77,7 @@
         </div>
       </section>
 
+      <!-- Ba lối vào chính: món ăn, tham quan và lập lịch. -->
       <section class="home-interests container" aria-labelledby="tiles-heading">
         <div class="section__head">
           <h2 id="tiles-heading">Start with what you love</h2>
@@ -92,6 +98,7 @@
         </div>
       </section>
 
+      <!-- Danh sách tour do JavaScript tạo từ hằng TOURS, không lấy từ bảng SQLite. -->
       <section class="home-tours container" aria-labelledby="tour-heading">
         <div class="section__head">
           <h2 id="tour-heading">Three good ways to begin</h2>
@@ -100,6 +107,7 @@
         <div class="home-tour-grid" data-role="tour-grid"></div>
       </section>
 
+      <!-- Các thẻ nổi bật được điền sau khi API trả dữ liệu. -->
       <section class="guide-section container" aria-labelledby="food-heading">
         <div class="section__head section__head--row">
           <div><h2 id="food-heading">A taste of everyday Hanoi</h2><p>Small stools, big flavours. Find your next favourite.</p></div>
@@ -116,6 +124,7 @@
         <div class="card-grid home-places-grid" data-role="places-grid"></div>
       </section>
 
+      <!-- Khối giới thiệu cách lập lịch; nút dẫn sang trang Plan để thao tác thật. -->
       <section class="day-plan container" id="planner" aria-labelledby="planner-heading">
         <div class="day-plan__copy">
           <p class="eyebrow">Hanoi, your way</p>
@@ -132,7 +141,7 @@
     </main>
 
     <!-- ==================================================================
-         Section H — footer (UI-02)
+         Phần cuối — thông tin nhóm và liên kết điều hướng
          ================================================================== -->
     <footer class="site-footer">
       <div class="container site-footer__inner">
@@ -171,6 +180,7 @@
       </p>
     </footer>
 
-    <script type="module" src="/scripts/pages/home.page.js"></script>
+    <!-- Module cho phép import các tiện ích dùng chung và chạy sau khi HTML được phân tích. -->
+<script type="module" src="/scripts/pages/home.page.js"></script>
   </body>
 </html>

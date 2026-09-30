@@ -1,8 +1,6 @@
-/* ==========================================================================
-   Hanoi Local - base layer
-   Reset, document defaults, typography and shared layout primitives.
-   Component styles belong in components.css, page styles in pages.css.
-   ========================================================================== */
+/* CSS NỀN: thống nhất box-sizing, khoảng cách mặc định, chữ, ảnh và form.
+[hidden] phải thắng các quy tắc display khác; focus-visible và skip-link hỗ trợ dùng bàn phím. */
+/* Lớp nền dùng chung cho cả bốn trang. */
 
 *,
 *::before,
@@ -10,14 +8,7 @@
   box-sizing: border-box;
 }
 
-/*
- * The hidden attribute must always win.
- *
- * Without this, any component that sets its own display (.button is
- * inline-flex, .card is flex) keeps taking up space after JavaScript sets
- * element.hidden = true, because a class beats the [hidden] UA rule. That bug
- * is invisible in the markup and easy to miss, so it is settled once here.
- */
+/* Ưu tiên hidden hơn display của component để JavaScript ẩn phần tử được thực sự. */
 [hidden] {
   display: none !important;
 }
@@ -60,7 +51,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* --- Headings ---------------------------------------------------------- */
+/* --- Tiêu đề ---------------------------------------------------------- */
 
 h1,
 h2,
@@ -77,7 +68,7 @@ h1 {
   font-size: var(--text-hero);
   font-weight: var(--weight-black);
   line-height: var(--leading-hero);
-  /* A very long word must break rather than push the page sideways. */
+  /* Cho phép ngắt từ dài để tránh đẩy nội dung tràn ngang. */
   overflow-wrap: break-word;
 }
 
@@ -93,7 +84,7 @@ p {
   text-wrap: pretty;
 }
 
-/* --- Links ------------------------------------------------------------- */
+/* --- Liên kết ------------------------------------------------------------- */
 
 a {
   color: inherit;
@@ -105,7 +96,7 @@ a:hover {
   color: var(--accent-action);
 }
 
-/* --- Media ------------------------------------------------------------- */
+/* --- Ảnh và nội dung đa phương tiện ------------------------------------------------------------- */
 
 img,
 picture,
@@ -116,7 +107,7 @@ video {
   height: auto;
 }
 
-/* --- Forms ------------------------------------------------------------- */
+/* --- Các phần tử form ------------------------------------------------------------- */
 
 input,
 button,
@@ -134,14 +125,14 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* --- Focus: always visible, never removed ------------------------------ */
+/* --- Viền focus khi điều hướng bằng bàn phím ------------------------------ */
 
 :focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
 }
 
-/* --- Accessibility helpers -------------------------------------------- */
+/* --- Hỗ trợ truy cập bằng bàn phím và trình đọc màn hình -------------------------------------------- */
 
 .visually-hidden {
   position: absolute;
@@ -175,7 +166,7 @@ button:disabled {
   transform: translateY(0);
 }
 
-/* --- Layout primitives ------------------------------------------------- */
+/* --- Khung bố cục dùng chung ------------------------------------------------- */
 
 .container {
   width: 100%;

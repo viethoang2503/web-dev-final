@@ -1,13 +1,17 @@
+/**
+ * QUY ƯỚC PHẢN HỒI: các API dùng chung hàm trả JSON để frontend đọc nhất quán.
+ * Danh sách: { data: [...], meta: { count, ... } }; một mục: { data: {...} }; lỗi: { error: {...} }.
+ */
 /** Định dạng phản hồi chung: {data, meta} hoặc {error}. */
 
-/** Stable error codes the frontend is allowed to branch on. */
+/** Mã lỗi thống nhất để phía gọi có thể phân biệt từng trường hợp. */
 export const ErrorCode = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   NOT_FOUND: 'NOT_FOUND',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 };
 
-/** Default browser-safe message per code. Never leak SQL or stack details. */
+/** Thông báo mặc định cho từng mã lỗi, không chứa SQL hoặc stack trace nội bộ. */
 const DEFAULT_MESSAGES = {
   [ErrorCode.VALIDATION_ERROR]: 'Please check the submitted fields.',
   [ErrorCode.NOT_FOUND]: 'The requested resource was not found.',
@@ -21,8 +25,8 @@ const STATUS_BY_CODE = {
 };
 
 /**
- * Error type route handlers throw. The error middleware turns it into the
- * documented envelope; anything else becomes a generic 500.
+ * ApiError mang mã lỗi và HTTP status. Router ném lỗi này, middleware sẽ trả JSON tương ứng.
+ * Những lỗi khác được chuyển thành lỗi 500 với thông báo chung.
  */
 export class ApiError extends Error {
   constructor(code, message, { details, cause } = {}) {
@@ -43,17 +47,17 @@ export class ApiError extends Error {
 
 }
 
-/** Send a list payload with a count in meta. */
+/** Trả danh sách kèm số phần tử trong meta.count. */
 export function sendList(res, items, meta = {}) {
   return res.json({ data: items, meta: { count: items.length, ...meta } });
 }
 
-/** Send a single object payload. */
+/** Trả một đối tượng với HTTP status, mặc định 200. */
 export function sendObject(res, item, status = 200) {
   return res.status(status).json({ data: item });
 }
 
-/** Send an error envelope. Called by the error middleware, not by routes. */
+/** Middleware gọi hàm này để trả status và nội dung lỗi theo cùng cấu trúc. */
 export function sendError(res, error) {
   const apiError = error instanceof ApiError ? error : new ApiError(ErrorCode.INTERNAL_ERROR);
   const body = { error: { code: apiError.code, message: apiError.message } };

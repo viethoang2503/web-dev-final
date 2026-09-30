@@ -1,3 +1,7 @@
+/**
+ * TẦNG ĐỌC DỮ LIỆU: lấy món ăn/địa điểm từ bảng spots và chuyển thành đối tượng cho frontend.
+ * Thông tin quán được ghép thêm từ FOOD_VENUES theo id món; quán không nằm trong bảng riêng ở SQLite.
+ */
 /** Đọc bảng spots; đổi tên cột SQL thành JSON mà frontend sử dụng. */
 import { getDb } from '../database/connection.js';
 import { FOOD_VENUES } from '../data/food-venues.js';
@@ -10,7 +14,8 @@ const SELECT_COLUMNS = `
   address, opening_hours, local_tip, featured
 `;
 
-/** Database row -> public JSON shape. Null optional fields are dropped. */
+/** Chuyển hàng SQL thành JSON; một số trường tùy chọn vẫn giữ giá trị null. */
+// Đổi snake_case của SQL sang camelCase cho JavaScript; trường null có thể vẫn được giữ trong JSON.
 function toSpot(row) {
   const spot = {
     id: row.id,
@@ -28,7 +33,7 @@ function toSpot(row) {
     featured: row.featured === 1,
   };
 
-  // Kind-specific fields, so a Food card never has to handle admission.
+  // Tách trường theo loại: món có mức giá/quán; địa điểm có vé/thời lượng/tọa độ.
   if (row.kind === 'food') {
     spot.priceLevel = row.price_level;
     // Một món có nhiều quán để người dùng tự chọn và so khoảng cách ước tính.
@@ -45,13 +50,14 @@ function toSpot(row) {
 }
 
 /**
- * List spots, newest ordering rule: featured first, then rating, then name.
- * That is the "recommended" sort the frontend starts from.
+ * Lấy danh sách: mục nổi bật trước, sau đó đánh giá giảm dần, cuối cùng tên tăng dần.
+ * Frontend nhận thứ tự gợi ý này làm thứ tự ban đầu.
  *
  * @param {{ kind?: string }} [filters]
  */
 export function listSpots({ kind } = {}) {
   const db = getDb();
+  // Chỉ ghép đoạn SQL do chương trình định nghĩa; giá trị kind truyền qua dấu ? để tách dữ liệu khỏi lệnh SQL.
   const where = kind ? 'WHERE kind = ?' : '';
   const params = kind ? [kind] : [];
 
@@ -67,19 +73,20 @@ export function listSpots({ kind } = {}) {
   return rows.map(toSpot);
 }
 
-/** One spot by id, or undefined when it does not exist. */
+/** Tìm một mục theo id; không thấy thì trả undefined để router báo 404. */
 export function getSpotById(id) {
   const db = getDb();
   const row = db.prepare(`SELECT ${SELECT_COLUMNS} FROM spots WHERE id = ?`).get(id);
   return row ? toSpot(row) : undefined;
 }
 
-/** Distinct filter values per kind, so filter controls are data-driven. */
+/** Lấy các nhóm/quận không trùng theo loại để đưa vào metadata của API. */
 export function getFilterOptions(kind) {
   const db = getDb();
   const where = kind ? 'WHERE kind = ?' : '';
   const params = kind ? [kind] : [];
 
+  // Tên cột chỉ đến từ hai lời gọi cố định bên dưới; SELECT DISTINCT lấy mỗi giá trị lọc một lần.
   const read = (column) =>
     db
       .prepare(`SELECT DISTINCT ${column} AS value FROM spots ${where} ORDER BY value ASC`)

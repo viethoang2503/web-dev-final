@@ -1,18 +1,22 @@
 <!doctype html>
+<!-- Trang tham quan: places.page.js dựng danh sách, lọc theo từ khóa và tạo link sang Plan. -->
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <!-- UTF-8 hỗ trợ tiếng Việt; viewport quy định kích thước vùng hiển thị theo thiết bị. -->
+    <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>See & do — Hanoi Local</title>
   <meta name="description" content="Find Hanoi places with visit length, admission and Google Maps links." />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/styles/fonts.css" />
+  <!-- Nạp font → biến thiết kế → CSS nền → CSS riêng; quy tắc phía sau có thể ghi đè phía trước. -->
+    <link rel="stylesheet" href="/styles/fonts.css" />
   <link rel="stylesheet" href="/styles/tokens.css" />
   <link rel="stylesheet" href="/styles/base.css" />
   <link rel="stylesheet" href="/styles/guide.css" />
 </head>
 <body class="guide-page">
 <a class="skip-link" href="#main">Skip to content</a>
+<!-- Điều hướng chung giữa bốn trang; aria-current đánh dấu trang đang mở. -->
 <header class="site-header">
       <div class="utility-bar"><div class="container utility-bar__inner">Hanoi travel guide</div></div>
       <div class="container site-header__inner">
@@ -40,9 +44,11 @@
   <div class="guide-controls guide-controls--single">
     <label>Find a place<input id="places-search" class="input" type="search" placeholder="Lake, temple, museum..." /></label>
   </div>
+  <!-- role=status đọc thông báo số kết quả khi JavaScript cập nhật; danh sách bên dưới ban đầu trống. -->
   <p id="places-count" class="guide-count" role="status">Loading places...</p>
   <div id="places-list" class="places-list"></div>
 </main>
 <footer class="guide-footer"><div class="container"><strong>Hanoi Local</strong><p>Discover food, see the city and plan your days in Hanoi.</p></div></footer>
+<!-- Module cho phép import các tiện ích dùng chung và chạy sau khi HTML được phân tích. -->
 <script type="module" src="/scripts/pages/places.page.js"></script>
 </body></html>
