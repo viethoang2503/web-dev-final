@@ -26,7 +26,7 @@ export function errorHandler(err, req, res, next) {
     return sendError(res, err);
   }
 
-  // Nhánh dự phòng nếu dùng express.json(); server hiện tại chưa đăng ký bộ đọc body này.
+  // Body JSON sai cú pháp (express.json trong api.routes.js).
   if (err?.type === 'entity.parse.failed') {
     return sendError(res, ApiError.validation('The request body is not valid JSON.'));
   }

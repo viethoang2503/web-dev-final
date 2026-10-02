@@ -43,6 +43,30 @@ function addMissingColumns(db) {
   for (const column of ['lat', 'lng']) {
     if (!existing.has(column)) db.exec(`ALTER TABLE spots ADD COLUMN ${column} REAL`);
   }
+
+  const userColumns = new Set(db.prepare('PRAGMA table_info(users)').all().map((column) => column.name));
+  if (!userColumns.has('plan')) {
+    db.exec("ALTER TABLE users ADD COLUMN plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free', 'premium'))");
+  }
+}
+
+/**
+ * Bảng users bản đầu chỉ có Google (google_sub NOT NULL). SQLite không đổi được ràng buộc cột,
+ * nên đổi tên bảng cũ trước khi schema.sql tạo bảng mới, rồi chép dữ liệu sang.
+ */
+function renameLegacyUsers(db) {
+  const columns = db.prepare('PRAGMA table_info(users)').all().map((column) => column.name);
+  if (columns.length > 0 && !columns.includes('password_hash')) {
+    db.exec('ALTER TABLE users RENAME TO users_legacy');
+  }
+}
+
+function copyLegacyUsers(db) {
+  const legacy = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'users_legacy'").get();
+  if (!legacy) return;
+  db.exec(`INSERT INTO users (id, google_sub, email, name, picture, created_at)
+           SELECT id, google_sub, email, name, picture, created_at FROM users_legacy`);
+  db.exec('DROP TABLE users_legacy');
 }
 
 export function initDatabase({ fresh = false } = {}) {
@@ -55,7 +79,9 @@ export function initDatabase({ fresh = false } = {}) {
 
   const schema = readFileSync(path.join(here, 'schema.sql'), 'utf8');
   const db = getDb();
+  renameLegacyUsers(db);
   db.exec(schema);
+  copyLegacyUsers(db);
   addMissingColumns(db);
   return db;
 }

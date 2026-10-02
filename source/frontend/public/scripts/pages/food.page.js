@@ -4,6 +4,9 @@
  */
 import { ORIGINS, approxKm, loadSpots, mapsDirections, readFavorites, readTrip, saveTrip, sortedVenues, toggleFavorite } from '../shared/guide.js';
 import { el, link, picture } from '../shared/ui.js';
+import { initAuth } from '../shared/auth.js';
+
+initAuth();
 
 const search = document.querySelector('#food-search');
 const originSelect = document.querySelector('#food-origin');

@@ -183,3 +183,6 @@ Grid chia cột lớn, Flex sắp nhóm nút; các class khớp với phần t�
   .print-day__list li { display: grid; gap: 2pt; margin-bottom: 8pt; break-inside: avoid; }
   .print-day__list em { color: var(--color-error); font-size: 10pt; }
 }
+
+.plan-upgrade { margin-top: 12px; padding: 10px 14px; background: var(--bg-sunken); border-left: 4px solid var(--accent-brand); font-weight: 600; }
+.plan-upgrade a { color: var(--accent-action); font-weight: 800; }

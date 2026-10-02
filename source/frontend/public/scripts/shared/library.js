@@ -42,11 +42,11 @@ export function readSavedPlans(storage = localStorage) {
 }
 
 /** Lưu bản sao của lịch; trùng tên (không phân biệt hoa thường) thì ghi đè bản cũ. */
-export function savePlan(name, trip, storage = localStorage, now = Date.now()) {
+export function savePlan(name, trip, storage = localStorage, now = Date.now(), maxPlans = MAX_SAVED_PLANS) {
   const plans = readSavedPlans(storage);
   const finalName = cleanName(name, `Plan ${trip.startDate}`);
   const existing = plans.find((item) => item.name.toLowerCase() === finalName.toLowerCase());
-  if (!existing && plans.length >= MAX_SAVED_PLANS) return { error: `You can keep up to ${MAX_SAVED_PLANS} saved plans. Delete one first.`, plans };
+  if (!existing && plans.length >= maxPlans) return { error: `You can keep up to ${maxPlans} saved ${maxPlans === 1 ? 'plan' : 'plans'}. Delete one first.`, plans };
   const entry = { id: existing?.id ?? newId(), name: finalName, savedAt: now, trip: normalizeTrip(JSON.parse(JSON.stringify(trip))) };
   const next = [entry, ...plans.filter((item) => item.id !== entry.id)];
   storage.setItem(PLANS_KEY, JSON.stringify(next));

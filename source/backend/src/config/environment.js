@@ -23,5 +23,12 @@ export const config = {
   isProduction: process.env.NODE_ENV === 'production',
   // Đường dẫn tính từ gốc dự án, không phụ thuộc thư mục chạy lệnh.
   databasePath: path.resolve(projectRoot, rawDatabasePath),
+  // Đăng nhập Google: Client ID lấy từ Google Cloud Console; SESSION_SECRET dùng để ký cookie phiên.
+  googleClientId: process.env.GOOGLE_CLIENT_ID ?? '',
+  sessionSecret: process.env.SESSION_SECRET ?? 'dev-only-secret-change-me',
+  // Email (cách nhau bằng dấu phẩy) tự động được quyền admin khi đăng ký hoặc đăng nhập.
+  adminEmails: (process.env.ADMIN_EMAILS ?? '').split(',').map((email) => email.trim().toLowerCase()).filter(Boolean),
+  // Địa chỉ công khai của site, dùng trong URL của mã QR. Để trống thì tự lấy từ yêu cầu (và địa chỉ mạng LAN khi chạy localhost).
+  publicUrl: (process.env.PUBLIC_URL ?? '').replace(/\/+$/, ''),
   publicDir: path.join(projectRoot, 'source', 'frontend', 'public'),
 };

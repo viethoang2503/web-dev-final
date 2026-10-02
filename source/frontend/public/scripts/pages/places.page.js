@@ -4,6 +4,9 @@
  */
 import { loadSpots, mapsSearch } from '../shared/guide.js';
 import { el, link, picture } from '../shared/ui.js';
+import { initAuth } from '../shared/auth.js';
+
+initAuth();
 
 const search = document.querySelector('#places-search');
 const grid = document.querySelector('#places-list');

@@ -8,6 +8,10 @@
 export const ErrorCode = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   NOT_FOUND: 'NOT_FOUND',
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  CONFLICT: 'CONFLICT',
+  RATE_LIMITED: 'RATE_LIMITED',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 };
 
@@ -15,12 +19,20 @@ export const ErrorCode = {
 const DEFAULT_MESSAGES = {
   [ErrorCode.VALIDATION_ERROR]: 'Please check the submitted fields.',
   [ErrorCode.NOT_FOUND]: 'The requested resource was not found.',
+  [ErrorCode.UNAUTHORIZED]: 'Please sign in to continue.',
+  [ErrorCode.FORBIDDEN]: 'You do not have permission to do that.',
+  [ErrorCode.CONFLICT]: 'That already exists.',
+  [ErrorCode.RATE_LIMITED]: 'Too many attempts. Please wait a few minutes.',
   [ErrorCode.INTERNAL_ERROR]: 'Something went wrong. Please try again.',
 };
 
 const STATUS_BY_CODE = {
   [ErrorCode.VALIDATION_ERROR]: 400,
   [ErrorCode.NOT_FOUND]: 404,
+  [ErrorCode.UNAUTHORIZED]: 401,
+  [ErrorCode.FORBIDDEN]: 403,
+  [ErrorCode.CONFLICT]: 409,
+  [ErrorCode.RATE_LIMITED]: 429,
   [ErrorCode.INTERNAL_ERROR]: 500,
 };
 
@@ -43,6 +55,22 @@ export class ApiError extends Error {
 
   static notFound(message) {
     return new ApiError(ErrorCode.NOT_FOUND, message);
+  }
+
+  static unauthorized(message) {
+    return new ApiError(ErrorCode.UNAUTHORIZED, message);
+  }
+
+  static forbidden(message) {
+    return new ApiError(ErrorCode.FORBIDDEN, message);
+  }
+
+  static conflict(message) {
+    return new ApiError(ErrorCode.CONFLICT, message);
+  }
+
+  static rateLimited(message) {
+    return new ApiError(ErrorCode.RATE_LIMITED, message);
   }
 
 }

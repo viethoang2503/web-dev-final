@@ -1,0 +1,96 @@
+<!doctype html>
+<!-- Trang nâng cấp Premium (thanh toán giả lập): upgrade.page.js lấy giá từ API và gọi /api/billing/upgrade. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles/fonts.css" />
+  <link rel="stylesheet" href="/styles/tokens.css" />
+  <link rel="stylesheet" href="/styles/base.css" />
+  <link rel="stylesheet" href="/styles/guide.css" />
+  <title>Go Premium - Hanoi Local</title>
+  <meta name="description" content="Upgrade to Hanoi Local Premium for longer trips, more saved plans, sharing and calendar export." />
+  <link rel="stylesheet" href="/styles/upgrade.css" />
+</head>
+<body class="guide-page">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+      <div class="utility-bar"><div class="container utility-bar__inner">Hanoi travel guide</div></div>
+      <div class="container site-header__inner">
+        <a class="brand" href="/"><span class="brand__hanoi">Hanoi</span><span class="brand__local">Local</span></a>
+        <nav class="site-nav" aria-label="Main">
+          <ul class="site-nav__list">
+            <li><a class="site-nav__link" href="/">Home</a></li>
+            <li><a class="site-nav__link" href="/food.html">Eat &amp; drink</a></li>
+            <li><a class="site-nav__link" href="/places.html">See &amp; do</a></li>
+            <li><a class="site-nav__link" href="/plan.html">Plan your day</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+<main id="main" class="container upgrade-page">
+  <section class="upgrade-intro" aria-labelledby="upgrade-title">
+    <p class="eyebrow">Hanoi Local Premium</p>
+    <h1 id="upgrade-title">Plan longer. Share more.</h1>
+    <p>Upgrade once and keep Premium on your account.</p>
+  </section>
+
+  <div class="upgrade-plans">
+    <article class="upgrade-plan">
+      <h2>Free</h2>
+      <p class="upgrade-price">0₫</p>
+      <ul>
+        <li>Plans up to 3 days</li>
+        <li>1 saved plan</li>
+        <li>Browse all food and places</li>
+      </ul>
+    </article>
+    <article class="upgrade-plan upgrade-plan--premium">
+      <h2>Premium</h2>
+      <p class="upgrade-price"><span id="price">5,000₫</span></p>
+      <ul>
+        <li>Plans up to 30 days</li>
+        <li>Up to 10 saved plans</li>
+        <li>Share link for your plan</li>
+        <li>Add to calendar (.ics)</li>
+        <li>Print your plan</li>
+      </ul>
+      <div id="upgrade-action"></div>
+    </article>
+  </div>
+
+  <!-- Thanh toán QR giả lập: quét mã (hoặc mở trang thanh toán) để xác nhận; trang tự nâng cấp khi đơn được trả. -->
+  <section id="checkout" class="upgrade-checkout" aria-labelledby="checkout-title" hidden>
+    <h2 id="checkout-title">Scan to pay</h2>
+    <div class="qr-layout">
+      <img id="qr-image" class="qr-image" width="240" height="240" alt="QR code to pay for Hanoi Local Premium" />
+      <div class="qr-details">
+        <dl class="qr-facts">
+          <div><dt>Amount</dt><dd id="checkout-price"></dd></div>
+          <div><dt>Transfer note</dt><dd id="checkout-memo"></dd></div>
+          <div><dt>Expires in</dt><dd id="checkout-timer"></dd></div>
+        </dl>
+        <p id="checkout-status" class="qr-status" role="status">Waiting for payment…</p>
+        <p class="upgrade-demo">Demo only: no real money moves. Scan with your phone (on the same Wi-Fi) or open the payment page below, then confirm. This page upgrades you automatically.</p>
+        <div class="upgrade-checkout__actions">
+          <a id="open-pay" class="button button--secondary" href="#" target="_blank" rel="noopener">Open payment page</a>
+          <button id="cancel-pay" class="button button--secondary" type="button">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <p id="upgrade-error" class="upgrade-error" role="alert" hidden></p>
+    <button id="new-qr" class="button button--primary" type="button" hidden>Create a new QR code</button>
+  </section>
+
+  <section id="upgrade-done" class="upgrade-checkout" aria-labelledby="done-title" role="status" hidden>
+    <h2 id="done-title">You are Premium now</h2>
+    <p>Thank you! Longer trips, sharing, calendar export and printing are unlocked.</p>
+    <a class="button button--primary" href="/plan.html">Go to Plan your day</a>
+  </section>
+</main>
+
+<script type="module" src="/scripts/pages/upgrade.page.js"></script>
+</body>
+</html>

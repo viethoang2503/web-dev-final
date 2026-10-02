@@ -1,0 +1,69 @@
+<!doctype html>
+<!-- Trang đăng nhập / tạo tài khoản: login.page.js xử lý hai form và nút Google. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles/fonts.css" />
+  <link rel="stylesheet" href="/styles/tokens.css" />
+  <link rel="stylesheet" href="/styles/base.css" />
+  <link rel="stylesheet" href="/styles/guide.css" />
+  <title>Sign in - Hanoi Local</title>
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="/styles/account.css" />
+</head>
+<body class="guide-page">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+      <div class="utility-bar"><div class="container utility-bar__inner">Hanoi travel guide</div></div>
+      <div class="container site-header__inner">
+        <a class="brand" href="/"><span class="brand__hanoi">Hanoi</span><span class="brand__local">Local</span></a>
+        <nav class="site-nav" aria-label="Main">
+          <ul class="site-nav__list">
+            <li><a class="site-nav__link" href="/">Home</a></li>
+            <li><a class="site-nav__link" href="/food.html">Eat &amp; drink</a></li>
+            <li><a class="site-nav__link" href="/places.html">See &amp; do</a></li>
+            <li><a class="site-nav__link" href="/plan.html">Plan your day</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+<main id="main" class="container account-page">
+  <section class="account-card" aria-labelledby="account-title">
+    <p class="eyebrow">Hanoi Local</p>
+    <h1 id="account-title">Sign in</h1>
+    <p id="account-note" class="account-note" hidden></p>
+
+    <div class="account-tabs">
+      <button id="tab-login" class="account-tab" type="button" aria-pressed="true">Sign in</button>
+      <button id="tab-register" class="account-tab" type="button" aria-pressed="false">Create account</button>
+    </div>
+
+    <form id="login-form" class="account-form" novalidate>
+      <label>Email<input id="login-email" class="input" name="email" type="email" autocomplete="email" required /></label>
+      <label>Password<input id="login-password" class="input" name="password" type="password" autocomplete="current-password" required /></label>
+      <button class="button button--primary" type="submit">Sign in</button>
+    </form>
+
+    <form id="register-form" class="account-form" novalidate hidden>
+      <label>Name<input id="register-name" class="input" name="name" type="text" autocomplete="name" maxlength="80" required /></label>
+      <label>Email<input id="register-email" class="input" name="email" type="email" autocomplete="email" required /></label>
+      <label>Password<input id="register-password" class="input" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required />
+        <span class="account-hint">At least 8 characters.</span></label>
+      <button class="button button--primary" type="submit">Create account</button>
+    </form>
+
+    <p id="account-error" class="account-error" role="alert" hidden></p>
+
+    <div id="google-area" hidden>
+      <p class="account-divider"><span>or</span></p>
+      <div id="google-button" class="account-google"></div>
+    </div>
+  </section>
+</main>
+
+<script type="module" src="/scripts/pages/login.page.js"></script>
+</body>
+</html>

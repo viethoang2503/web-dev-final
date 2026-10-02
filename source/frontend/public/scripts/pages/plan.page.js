@@ -23,6 +23,21 @@ import { MAX_DURATION, MAX_STOPS_PER_DAY, MIN_DURATION, SLOT_LABEL, formatTime, 
 import { buildTourStops } from '../shared/tours.js';
 import { el, link, picture } from '../shared/ui.js';
 import { createPicker, createConfirmation } from '../shared/plan-controls.js';
+import { initAuth } from '../shared/auth.js';
+
+// Tài khoản free bị giới hạn; Premium (hoặc admin) dùng đủ. Các giới hạn này chỉ áp dụng ở trình duyệt vì lịch lưu trong localStorage.
+const FREE_MAX_DAYS = 3;
+const FREE_MAX_SAVED_PLANS = 1;
+const premium = Boolean((await initAuth())?.premium);
+const maxDays = premium ? MAX_DAYS : FREE_MAX_DAYS;
+const PREMIUM_HINT = 'Upgrade to Premium with the link at the top of this page.';
+
+// Tài khoản free thấy lời mời nâng cấp ngay đầu trang.
+if (!premium) {
+  const note = el('p', 'plan-upgrade', `Free plan: up to ${FREE_MAX_DAYS} days and ${FREE_MAX_SAVED_PLANS} saved plan. `);
+  note.append(link('Upgrade to Premium', '/upgrade.html'));
+  document.querySelector('.plan-intro__copy').append(note);
+}
 
 // TRẠNG THÁI TRANG: trip là nguồn dữ liệu chính; byId giúp tra món/địa điểm theo id nhanh hơn tìm mảng nhiều lần.
 const trip = readTrip();
@@ -655,7 +670,8 @@ function renderDates() {
   ui['start-date'].value = trip.startDate;
   ui['end-date'].value = addDays(trip.startDate, trip.dayCount - 1);
   ui['end-date'].min = trip.startDate;
-  ui['end-date'].max = addDays(trip.startDate, MAX_DAYS - 1);
+  ui['end-date'].max = addDays(trip.startDate, maxDays - 1);
+  ui['day-count'].max = String(maxDays);
   ui['day-count'].value = String(trip.dayCount);
   ui['trip-range'].textContent = trip.dayCount === 1
     ? 'Your trip ends on the same day.'
@@ -685,10 +701,13 @@ ui['start-date'].addEventListener('change', () => {
 });
 /** Đổi số ngày (từ ô số hoặc ngày kết thúc); giữ dữ liệu các ngày bị ẩn để bật lại khi tăng số ngày. */
 function setDayCount(days, field = 'day-count') {
-  if (!Number.isInteger(days) || days < 1 || days > MAX_DAYS) {
+  if (!premium && Number.isInteger(days) && days > maxDays && days <= MAX_DAYS) {
+    return settingsError(field, `Free accounts can plan up to ${FREE_MAX_DAYS} days. ${PREMIUM_HINT}`);
+  }
+  if (!Number.isInteger(days) || days < 1 || days > maxDays) {
     return settingsError(field, field === 'end-date'
-      ? `Choose an ending date within ${MAX_DAYS} days, on or after the starting date.`
-      : `Enter a whole number from 1 to ${MAX_DAYS}. Your current plan has not changed.`);
+      ? `Choose an ending date within ${maxDays} days, on or after the starting date.`
+      : `Enter a whole number from 1 to ${maxDays}. Your current plan has not changed.`);
   }
   settingsError(null, '');
   const previousCount = trip.dayCount;
@@ -843,8 +862,8 @@ document.querySelector('#save-plan').addEventListener('submit', (event) => {
   event.preventDefault();
   if (!trip.days.slice(0, trip.dayCount).some((day) => day.stops.length)) return message('Add at least one stop before saving a plan.');
   updateLibrary(() => {
-    const result = savePlan(ui['plan-name'].value, trip);
-    if (result.error) return message(result.error);
+    const result = savePlan(ui['plan-name'].value, trip, localStorage, Date.now(), premium ? undefined : FREE_MAX_SAVED_PLANS);
+    if (result.error) return message(premium ? result.error : `${result.error} ${PREMIUM_HINT}`);
     ui['plan-name'].value = '';
     renderSavedPlans();
     message(result.replaced ? 'Saved plan updated.' : 'Plan saved. Open it later from "Saved plans and my tours".');
@@ -871,9 +890,14 @@ document.querySelector('#save-tour').addEventListener('submit', (event) => {
     message(`Tour "${result.tours.at(-1).title}" saved. Use it on any day.`);
   });
 });
-ui['copy-share'].addEventListener('click', copyShareLink);
-ui['download-ics'].addEventListener('click', downloadCalendar);
-ui['print-plan'].addEventListener('click', () => { renderPrintView(); window.print(); });
+// Chia sẻ, xuất lịch và in là tính năng Premium: tài khoản free thấy nút nhưng chỉ nhận lời nhắc nâng cấp.
+function premiumOnly(button, label, action) {
+  if (!premium) button.textContent = `${button.textContent} (Premium)`;
+  button.addEventListener('click', () => (premium ? action() : message(`${label} is a Premium feature. ${PREMIUM_HINT}`)));
+}
+premiumOnly(ui['copy-share'], 'Sharing a plan', copyShareLink);
+premiumOnly(ui['download-ics'], 'Adding a plan to your calendar', downloadCalendar);
+premiumOnly(ui['print-plan'], 'Printing a plan', () => { renderPrintView(); window.print(); });
 
 /** Áp dụng lịch từ link chia sẻ; nếu đang có lịch khác thì cho phép hoàn tác. */
 function applySharedTrip() {

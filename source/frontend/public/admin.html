@@ -1,0 +1,112 @@
+<!doctype html>
+<!-- Trang quản trị: chỉ admin vào được (server chuyển hướng người khác). admin.page.js dựng hai bảng và form. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles/fonts.css" />
+  <link rel="stylesheet" href="/styles/tokens.css" />
+  <link rel="stylesheet" href="/styles/base.css" />
+  <link rel="stylesheet" href="/styles/guide.css" />
+  <title>Admin - Hanoi Local</title>
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="/styles/admin.css" />
+</head>
+<body class="guide-page admin-page">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+      <div class="utility-bar"><div class="container utility-bar__inner">Hanoi travel guide</div></div>
+      <div class="container site-header__inner">
+        <a class="brand" href="/"><span class="brand__hanoi">Hanoi</span><span class="brand__local">Local</span></a>
+        <nav class="site-nav" aria-label="Main">
+          <ul class="site-nav__list">
+            <li><a class="site-nav__link" href="/">Home</a></li>
+            <li><a class="site-nav__link" href="/food.html">Eat &amp; drink</a></li>
+            <li><a class="site-nav__link" href="/places.html">See &amp; do</a></li>
+            <li><a class="site-nav__link" href="/plan.html">Plan your day</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+<main id="main" class="container">
+  <section class="admin-heading" aria-labelledby="admin-title">
+    <p class="eyebrow">Administration</p>
+    <h1 id="admin-title">Manage Hanoi Local</h1>
+  </section>
+
+  <div class="admin-tabs" role="group" aria-label="Sections">
+    <button id="tab-spots" class="admin-tab" type="button" aria-pressed="true">Places &amp; food</button>
+    <button id="tab-users" class="admin-tab" type="button" aria-pressed="false">Users</button>
+  </div>
+
+  <p id="admin-status" class="admin-status" role="status" hidden></p>
+
+  <!-- Món ăn và địa điểm -->
+  <section id="spots-panel" aria-labelledby="spots-title">
+    <div class="admin-bar">
+      <h2 id="spots-title">Places &amp; food <span id="spots-count" class="admin-count"></span></h2>
+      <div class="admin-bar__tools">
+        <select id="spots-filter" class="input" aria-label="Filter by type">
+          <option value="">All types</option>
+          <option value="food">Food</option>
+          <option value="place">Places</option>
+        </select>
+        <button id="add-spot" class="button button--primary" type="button">Add new</button>
+      </div>
+    </div>
+
+    <form id="spot-form" class="admin-form" novalidate hidden>
+      <h3 id="spot-form-title">Add new</h3>
+      <div class="admin-grid">
+        <label>Type
+          <select id="spot-kind" class="input" name="kind"><option value="food">Food</option><option value="place">Place</option></select></label>
+        <label>Name<input class="input" name="name" maxlength="120" required /></label>
+        <label>Category<input class="input" name="category" maxlength="80" required /></label>
+        <label>District<input class="input" name="district" maxlength="80" required /></label>
+        <label class="admin-wide">Short description<input class="input" name="shortDescription" maxlength="300" required /></label>
+        <label class="admin-wide">Description<textarea class="input" name="description" rows="4" maxlength="3000" required></textarea></label>
+        <label class="admin-wide">Image (path like /assets/images/spots/name.webp, or https://…)<input class="input" name="image" maxlength="500" required /></label>
+        <label>Rating (0–5)<input class="input" name="rating" type="number" min="0" max="5" step="0.1" /></label>
+        <label data-for="food">Price level (1 cheap – 3 high)<input class="input" name="priceLevel" type="number" min="1" max="3" step="1" /></label>
+        <label data-for="place">Admission (VND, 0 = free)<input class="input" name="admission" type="number" min="0" step="1000" /></label>
+        <label data-for="place">Visit length (minutes)<input class="input" name="durationMinutes" type="number" min="1" max="1440" step="5" /></label>
+        <label data-for="place">Latitude<input class="input" name="lat" type="number" min="-90" max="90" step="any" /></label>
+        <label data-for="place">Longitude<input class="input" name="lng" type="number" min="-180" max="180" step="any" /></label>
+        <label class="admin-wide">Address<input class="input" name="address" maxlength="300" /></label>
+        <label class="admin-wide">Opening hours<input class="input" name="openingHours" maxlength="200" /></label>
+        <label class="admin-wide">Local tip<input class="input" name="localTip" maxlength="500" /></label>
+        <label class="admin-check"><input name="featured" type="checkbox" /> Featured on the home page</label>
+      </div>
+      <p id="spot-error" class="admin-error" role="alert" hidden></p>
+      <div class="admin-form__actions">
+        <button class="button button--primary" type="submit">Save</button>
+        <button id="cancel-spot" class="button button--secondary" type="button">Cancel</button>
+      </div>
+      <p class="admin-hint">Restaurants for each dish live in the code (data/food-venues.js), so a new dish will show no venues until they are added there.</p>
+    </form>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Category</th><th scope="col">District</th><th scope="col">Rating</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <tbody id="spots-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Người dùng -->
+  <section id="users-panel" aria-labelledby="users-title" hidden>
+    <div class="admin-bar"><h2 id="users-title">Users <span id="users-count" class="admin-count"></span></h2></div>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Sign-in</th><th scope="col">Role</th><th scope="col">Plan</th><th scope="col">Joined</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <tbody id="users-body"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script type="module" src="/scripts/pages/admin.page.js"></script>
+</body>
+</html>

@@ -5,6 +5,9 @@
 /** Home chỉ tải vài mục nổi bật. Ba tour mẫu nằm trong guide.js. */
 import { loadSpots, TOURS } from '../shared/guide.js';
 import { el, link, picture } from '../shared/ui.js';
+import { initAuth } from '../shared/auth.js';
+
+initAuth();
 
 // Dựng một thẻ gồm ảnh, nhóm, tên có link và mô tả ngắn.
 function feature(spot, href) {

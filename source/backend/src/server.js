@@ -8,6 +8,7 @@ import express from 'express';
 import { config } from './config/environment.js';
 import { apiRouter } from './routes/api.routes.js';
 import { apiNotFound, errorHandler } from './middleware/error-handler.middleware.js';
+import { requireAdminPage, requireUserPage } from './middleware/auth.middleware.js';
 import { resolveImage } from './middleware/image-resolver.middleware.js';
 import { initDatabase } from './database/initialize.js';
 
@@ -21,6 +22,10 @@ app.disable('x-powered-by');
 // API được kiểm tra trước các file HTML/CSS/JS.
 app.use('/api', apiRouter);
 app.use('/api', apiNotFound);
+
+// Trang lập lịch cần đăng nhập; trang quản trị cần quyền admin. Kiểm tra trước khi phát file tĩnh.
+app.get(['/plan', '/plan.html'], requireUserPage);
+app.get(['/admin', '/admin.html'], requireAdminPage);
 
 // Ảnh của catalogue dùng URL không có đuôi; middleware chọn WebP/AVIF hiện có.
 app.use(resolveImage);

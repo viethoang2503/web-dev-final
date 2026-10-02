@@ -1,0 +1,16 @@
+/* Trang đăng nhập / tạo tài khoản. */
+.account-page { display: flex; justify-content: center; padding-block: 56px 96px; }
+.account-card { width: min(100%, 460px); padding: 36px; background: var(--bg-raised); border: 1px solid var(--border-default); border-radius: 8px; }
+.account-card h1 { margin: 4px 0 16px; font-size: 34px; }
+.account-note { margin: 0 0 16px; padding: 12px 14px; background: var(--bg-sunken); border-left: 4px solid var(--accent-brand); }
+.account-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 20px; border: 2px solid var(--text-primary); border-radius: 6px; overflow: hidden; }
+.account-tab { min-height: 44px; border: 0; background: #fff; font: inherit; font-weight: 700; cursor: pointer; color: var(--text-primary); }
+.account-tab[aria-pressed='true'] { background: var(--text-primary); color: #fff; }
+.account-form { display: grid; gap: 16px; }
+.account-form[hidden] { display: none; }
+.account-form label { display: grid; gap: 6px; font-weight: 700; }
+.account-hint { font-weight: 400; font-size: 14px; color: var(--text-secondary); }
+.account-error { margin: 16px 0 0; padding: 12px 14px; color: var(--color-error); background: #fdecea; border-radius: 6px; font-weight: 600; }
+.account-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; color: var(--text-secondary); }
+.account-divider::before, .account-divider::after { content: ''; flex: 1; border-top: 1px solid var(--border-default); }
+.account-google { display: flex; justify-content: center; min-height: 44px; }

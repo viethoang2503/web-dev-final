@@ -30,3 +30,40 @@ CREATE TABLE IF NOT EXISTS spots (
 -- Chỉ mục hỗ trợ tra cứu theo loại và trạng thái nổi bật, không tạo bản sao danh mục mới.
 CREATE INDEX IF NOT EXISTS idx_spots_kind ON spots (kind);
 CREATE INDEX IF NOT EXISTS idx_spots_featured ON spots (featured);
+
+-- Tài khoản: đăng ký bằng email + mật khẩu hoặc đăng nhập Google (một tài khoản có thể có cả hai).
+-- password_hash rỗng nghĩa là tài khoản chỉ dùng Google. role 'admin' mở trang quản trị.
+CREATE TABLE IF NOT EXISTS users (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  google_sub    TEXT UNIQUE,
+  email         TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  name          TEXT NOT NULL,
+  picture       TEXT,
+  password_hash TEXT,
+  role          TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
+  -- Gói tài khoản: 'premium' mở thêm tính năng lập lịch; admin cấp trong trang quản trị.
+  plan          TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free', 'premium')),
+  created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Lịch sử nâng cấp Premium. Thanh toán chỉ là giả lập (method = 'demo'), không có tiền thật.
+CREATE TABLE IF NOT EXISTS payments (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  amount_vnd INTEGER NOT NULL CHECK (amount_vnd >= 0),
+  method     TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Đơn nâng cấp Premium chờ thanh toán qua QR (giả lập). code là bí mật nằm trong URL của mã QR.
+-- expires_at lưu mili giây epoch; trạng thái hết hạn được tính khi đọc nên không cần tác vụ nền.
+CREATE TABLE IF NOT EXISTS payment_orders (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  code       TEXT NOT NULL UNIQUE,
+  amount_vnd INTEGER NOT NULL CHECK (amount_vnd >= 0),
+  status     TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  expires_at INTEGER NOT NULL,
+  paid_at    TEXT
+);
