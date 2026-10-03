@@ -75,7 +75,7 @@ await withPage(base + '/plan.html', { width: 1440, height: 900, settleMs: 450 },
   await page.click('#plan-status button');
   check('Undo restores the stop', await page.evaluate('JSON.parse(localStorage.getItem("hanoi-local-trip-v2")).days[2].stops.length === 2'));
   await page.click('.timeline-stop:last-child .timeline-stop__adjust summary');
-  await page.click('.timeline-stop:last-child [data-move$=":up"]');
+  await page.evaluate('document.querySelector(".timeline-stop:last-child [data-move]").dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true }))');
   check('Move up reorders stops and is stored', await page.evaluate('JSON.parse(localStorage.getItem("hanoi-local-trip-v2")).days[2].stops[0].kind === "place"'));
   await page.fill('.timeline-stop__adjust input[type=number]', '30', 'change');
   check('Custom duration is stored', await page.evaluate('JSON.parse(localStorage.getItem("hanoi-local-trip-v2")).days[2].stops.some(stop => stop.duration === 30)'));

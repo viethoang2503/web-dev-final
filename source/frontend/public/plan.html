@@ -65,6 +65,24 @@
       <details class="plan-end-date"><summary>Set an ending date instead</summary><label>Ending date<input id="end-date" class="input" type="date" required aria-describedby="settings-error" /></label></details>
     </div>
     <p id="settings-error" class="form-error" role="alert"></p>
+  <!-- Thư viện: lưu cả chuyến đi có tên hoặc biến một ngày thành tour tái sử dụng. -->
+<details id="plan-library" class="plan-library" open inert>
+    <summary>Saved plans and my tours</summary>
+    <div class="plan-library__grid">
+      <div>
+        <form id="save-plan" class="plan-library__form">
+          <label>Plan name<input id="plan-name" class="input" type="text" maxlength="40" placeholder="For example: Weekend with friends" /></label>
+          <button type="submit" class="button button--secondary">Save current plan</button>
+          <button id="new-plan" type="button" class="button button--secondary">Start a new empty plan</button>
+        </form>
+        <ul id="saved-plans" class="plan-library__list"></ul>
+      </div>
+      <form id="save-tour" class="plan-library__form">
+        <label>Save this day as my tour<input id="tour-name" class="input" type="text" maxlength="40" placeholder="For example: Lazy Sunday" /></label>
+        <button type="submit" class="button button--secondary">Save as my tour</button>
+      </form>
+    </div>
+  </details>
   </section>
   <section id="planner-workspace" class="plan-workspace" aria-labelledby="days-heading" inert>
   <div class="plan-workspace__heading"><h2 id="days-heading">Build your itinerary</h2><a href="#plan-library" id="library-link">Saved plans &amp; tours</a></div>
@@ -146,29 +164,10 @@
         <label id="share-fallback" class="plan-share-fallback" hidden>Copy this link<input id="share-url" class="input" type="text" readonly /></label>
         <div id="day-summary"></div>
         <div id="timeline"></div>
-        <details class="plan-help"><summary>How are times and distances calculated?</summary><p>Stops start from 08:00, 12:00 or 18:00 based on your chosen part of day. We add an estimated visit duration and travel buffer between stops. Edit any stop to set your own time.</p><p>Distances are straight-line estimates. Google Maps provides the actual route. Opening hours are reference information, not live availability. Entry fees exclude food and transport.</p></details>
       </section>
     </div>
   </section>
   </section>
-  <!-- Thư viện: lưu cả chuyến đi có tên hoặc biến một ngày thành tour tái sử dụng. -->
-<details id="plan-library" class="plan-library" inert>
-    <summary>Saved plans and my tours</summary>
-    <div class="plan-library__grid">
-      <div>
-        <form id="save-plan" class="plan-library__form">
-          <label>Plan name<input id="plan-name" class="input" type="text" maxlength="40" placeholder="For example: Weekend with friends" /></label>
-          <button type="submit" class="button button--secondary">Save current plan</button>
-          <button id="new-plan" type="button" class="button button--secondary">Start a new empty plan</button>
-        </form>
-        <ul id="saved-plans" class="plan-library__list"></ul>
-      </div>
-      <form id="save-tour" class="plan-library__form">
-        <label>Save this day as my tour<input id="tour-name" class="input" type="text" maxlength="40" placeholder="For example: Lazy Sunday" /></label>
-        <button type="submit" class="button button--secondary">Save as my tour</button>
-      </form>
-    </div>
-  </details>
 </main>
 <!-- Thông báo luôn thấy được, không cuộn người dùng ra khỏi form đang nhập. -->
 <div id="plan-status" class="plan-status" role="status" aria-live="polite" aria-atomic="true"></div>

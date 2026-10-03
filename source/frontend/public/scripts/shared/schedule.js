@@ -47,6 +47,26 @@ export function moveStop(stops, originalIndex, direction) {
   return list;
 }
 
+/**
+ * Kéo-thả: đưa điểm `fromIndex` tới trước (hoặc sau, nếu `after`) điểm `toIndex`; cả hai là chỉ số gốc trong `stops`.
+ * Điểm được kéo nhận buổi của điểm nó đứng cạnh, giống moveStop. Trả về mảng mới theo thứ tự hiển thị;
+ * trả lại `stops` nếu vị trí không đổi.
+ */
+export function moveStopTo(stops, fromIndex, toIndex, after = false) {
+  const ordered = orderStops(stops);
+  const from = ordered.findIndex((entry) => entry.originalIndex === fromIndex);
+  const target = ordered.findIndex((entry) => entry.originalIndex === toIndex);
+  if (from < 0 || target < 0 || from === target) return stops;
+  let position = target + (after ? 1 : 0);
+  if (from < position) position -= 1;
+  if (position === from) return stops;
+  const list = ordered.map((entry) => ({ ...entry.stop }));
+  const [moved] = list.splice(from, 1);
+  list.splice(position, 0, moved);
+  moved.slot = ordered[target].stop.slot;
+  return list;
+}
+
 const CUSTOM_TRAVEL_MINUTES = 15; // điểm tự nhập không có tọa độ nên chỉ ước lượng thời gian đi lại
 
 /** Buổi hợp với một giờ trong ngày: buổi muộn nhất có giờ bắt đầu không sau giờ đó. */
@@ -129,7 +149,11 @@ export function scheduleDay({ stops, origin, dateText, getSpot, getVenue, getPoi
     const warnings = [];
     const hoursWarning = openingWarning(spot.openingHours, dateText, start, end);
     if (hoursWarning) warnings.push(hoursWarning);
-    if (pinned && cursor !== null && start < earliest) {
+    const overlaps = pinned && cursor !== null && start < cursor;
+    if (overlaps) {
+      items.at(-1).overlap = true; // điểm liền trước cũng bị chồng nên cũng được tô đỏ
+      warnings.push(`Overlaps the previous stop, which ends at ${formatTime(cursor)}. Move this stop to ${formatTime(cursor)} or later.`);
+    } else if (pinned && cursor !== null && start < earliest) {
       warnings.push(`Not enough time to reach this stop from the previous one. Earliest arrival is about ${formatTime(earliest)}.`);
     }
     if (!pinned && startsSlot && start - slotStart >= LATE_WARNING_MINUTES) {
@@ -141,7 +165,7 @@ export function scheduleDay({ stops, origin, dateText, getSpot, getVenue, getPoi
     const address = venue?.address ?? spot.address;
     items.push({
       stop, originalIndex, spot, venue, point, name, address, previous, km,
-      travelMinutes: travel, start, end, duration, warnings, pinned, noCoords: isCustom,
+      travelMinutes: travel, start, end, duration, warnings, pinned, overlap: overlaps, noCoords: isCustom,
       customDuration: Number.isInteger(stop.duration),
     });
     cursor = end;
@@ -250,5 +274,25 @@ export function insertStopByTime(stops, stop, items) {
   const list = ordered.map((entry) => ({ ...entry.stop }));
   const position = ordered.findIndex((entry) => (startByIndex.get(entry.originalIndex) ?? -1) > stop.startTime);
   list.splice(position === -1 ? list.length : position, 0, stop);
+  return list;
+}
+
+/**
+ * Xếp lại danh sách theo giờ bắt đầu thực tế. Điểm tự động bị đẩy lùi bởi điểm đứng trước nên có thể rơi sau một điểm
+ * đã ghim giờ; hàm này đổi chỗ chúng (và đổi buổi theo giờ mới) rồi tính lại, lặp tới khi thứ tự ổn định.
+ * `schedule(list)` trả về scheduleDay().items của danh sách đó. Trả về mảng mới theo thứ tự hiển thị.
+ */
+export function settleOrder(stops, schedule) {
+  let list = orderStops(stops).map((entry) => ({ ...entry.stop }));
+  for (let pass = 0; pass < list.length; pass += 1) {
+    const items = schedule(list);
+    if (items.length !== list.length) break; // có điểm không còn trong danh mục: không đụng vào
+    const sorted = items.map((item, position) => ({ item, position })).sort((a, b) => a.item.start - b.item.start || a.position - b.position);
+    if (sorted.every((entry, index) => entry.position === index)) break;
+    list = sorted.map(({ item, position }, index) => {
+      const stop = list[item.originalIndex];
+      return position === index ? stop : { ...stop, slot: slotForTime(item.start) };
+    });
+  }
   return list;
 }

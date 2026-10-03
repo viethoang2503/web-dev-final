@@ -19,7 +19,7 @@ import { shareUrl, sharedTripFromHash } from '../shared/share.js';
 import {
   addCustomTour, deleteCustomTour, deletePlan, readCustomTours, readSavedPlans, savePlan,
 } from '../shared/library.js';
-import { MAX_DURATION, MAX_STOPS_PER_DAY, MIN_DURATION, SLOT_LABEL, formatTime, insertStopByTime, moveStop, optimizeOrder, orderStops, scheduleDay, slotForTime, suggestNearby } from '../shared/schedule.js';
+import { MAX_DURATION, MAX_STOPS_PER_DAY, MIN_DURATION, SLOT_LABEL, defaultDuration, formatTime, insertStopByTime, moveStop, moveStopTo, optimizeOrder, orderStops, scheduleDay, settleOrder, slotForTime, suggestNearby } from '../shared/schedule.js';
 import { buildTourStops } from '../shared/tours.js';
 import { el, link, picture } from '../shared/ui.js';
 import { createPicker, createConfirmation } from '../shared/plan-controls.js';
@@ -60,7 +60,10 @@ const ui = Object.fromEntries([
 const selectPicker = createPicker(document.getElementById('picker-tabs'));
 const confirmChange = createConfirmation(document.getElementById('confirm-change'));
 
-/** Thông báo ngắn; `undo` giữ bản sao trước thao tác để người dùng hoàn tác. */
+const MESSAGE_SECONDS = 5;
+let messageTimer;
+
+/** Thông báo ngắn, tự ẩn sau MESSAGE_SECONDS giây; `undo` giữ bản sao trước thao tác để người dùng hoàn tác. */
 function message(text, undo) {
   const parts = [el('span', '', `${text}${storageWarning ? ` ${storageWarning}` : ''}`)];
   if (undo) {
@@ -74,6 +77,9 @@ function message(text, undo) {
   dismiss.addEventListener('click', () => ui['plan-status'].replaceChildren());
   parts.push(dismiss);
   ui['plan-status'].replaceChildren(...parts);
+  // Thông báo mới thay thông báo cũ nên phải đặt lại đồng hồ.
+  clearTimeout(messageTimer);
+  messageTimer = setTimeout(() => ui['plan-status'].replaceChildren(), MESSAGE_SECONDS * 1000);
 }
 
 /** Trả về hàm khôi phục danh sách điểm dừng của ngày `day` như lúc gọi. */
@@ -220,24 +226,70 @@ function renderSummary(summary, items = []) {
   ui['day-summary'].replaceChildren(box);
 }
 
-// Nút lên/xuống lưu bản trước khi đổi thứ tự, tính lại giờ và hỗ trợ Undo.
-function moveButtons(entry, position, total) {
-  return [['up', -1, '↑ Move up', position === 0], ['down', 1, '↓ Move down', position === total - 1]].map(([key, direction, label, disabled]) => {
-    const button = el('button', 'timeline-stop__move', key === 'up' ? '↑' : '↓');
-    button.type = 'button';
-    button.disabled = disabled;
-    button.dataset.move = `${entry.spot.id}:${key}`;
-    button.setAttribute('aria-label', `${label.slice(2)}: ${entry.spot.name}`);
-    button.title = label.slice(2);
-    button.addEventListener('click', () => {
-      const restore = snapshotDay(activeDay);
-      trip.days[activeDay].stops = moveStop(currentStops(), entry.originalIndex, direction);
-      pendingFocus = `${entry.spot.id}:${key}`;
-      save(); renderTimeline();
-      message(`${entry.spot.name} moved ${key}. Automatic times updated.`, restore);
-    });
-    return button;
+// Tay nắm kéo-thả đổi thứ tự. Mỗi lần đổi lưu bản trước, tính lại giờ và hỗ trợ Undo.
+// Bàn phím: focus tay nắm rồi nhấn mũi tên lên/xuống.
+function reorderStops(entry, change, text) {
+  const restore = snapshotDay(activeDay);
+  trip.days[activeDay].stops = change(currentStops());
+  pendingFocus = `${entry.spot.id}:handle`;
+  save(); renderTimeline();
+  message(text, restore);
+}
+
+let draggedIndex = null;
+
+function dragHandle(item, entry) {
+  const handle = el('button', 'timeline-stop__drag', '⠿');
+  handle.type = 'button';
+  handle.dataset.move = `${entry.spot.id}:handle`;
+  handle.title = 'Drag to reorder';
+  handle.setAttribute('aria-label', `Reorder ${entry.spot.name}. Drag, or use the up and down arrow keys.`);
+  // Chỉ cho kéo khi bắt đầu từ tay nắm, để các ô nhập trong phần chỉnh sửa vẫn bôi chọn chữ được.
+  handle.addEventListener('pointerdown', () => { item.draggable = true; });
+  handle.addEventListener('pointerup', () => { item.draggable = false; });
+  handle.addEventListener('keydown', (event) => {
+    const direction = { ArrowUp: -1, ArrowDown: 1 }[event.key];
+    if (!direction) return;
+    event.preventDefault();
+    const moved = moveStop(currentStops(), entry.originalIndex, direction);
+    if (moved === currentStops()) return;
+    reorderStops(entry, () => moved, `${entry.spot.name} moved ${direction < 0 ? 'up' : 'down'}. Automatic times updated.`);
   });
+
+  item.addEventListener('dragstart', (event) => {
+    draggedIndex = entry.originalIndex;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', entry.spot.name);
+    item.classList.add('timeline-stop--dragging');
+  });
+  item.addEventListener('dragend', () => {
+    draggedIndex = null;
+    item.draggable = false;
+    for (const row of ui.timeline.querySelectorAll('.timeline-stop')) row.classList.remove('timeline-stop--dragging', 'timeline-stop--drop-before', 'timeline-stop--drop-after');
+  });
+  // Nửa trên của hàng đích nghĩa là chèn phía trên, nửa dưới là chèn phía dưới.
+  const dropAfter = (event) => event.clientY > item.getBoundingClientRect().top + item.offsetHeight / 2;
+  item.addEventListener('dragover', (event) => {
+    if (draggedIndex === null || draggedIndex === entry.originalIndex) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    const after = dropAfter(event);
+    item.classList.toggle('timeline-stop--drop-before', !after);
+    item.classList.toggle('timeline-stop--drop-after', after);
+  });
+  item.addEventListener('dragleave', () => item.classList.remove('timeline-stop--drop-before', 'timeline-stop--drop-after'));
+  item.addEventListener('drop', (event) => {
+    if (draggedIndex === null || draggedIndex === entry.originalIndex) return;
+    event.preventDefault();
+    const from = draggedIndex;
+    const after = dropAfter(event);
+    draggedIndex = null;
+    const moved = moveStopTo(currentStops(), from, entry.originalIndex, after);
+    if (moved === currentStops()) return renderTimeline();
+    const dragged = currentStops()[from];
+    reorderStops({ spot: { id: dragged.spotId } }, () => moved, 'Stop moved. Automatic times updated.');
+  });
+  return handle;
 }
 
 // Đổi chuỗi HH:mm của input time sang số phút để thuật toán xử lý.
@@ -274,8 +326,19 @@ function adjustPanel(entry) {
   startLabel.append(start);
   start.addEventListener('change', () => {
     const minutes = toMinutes(start.value);
-    if (minutes === null) delete stop().startTime; else stop().startTime = minutes;
-    save(); renderTimeline();
+    if (minutes === null) {
+      delete stop().startTime;
+      save(); renderTimeline();
+      return;
+    }
+    // Giữ đúng giờ khách chọn, xếp lại theo giờ và cảnh báo nếu chồng lên điểm khác.
+    const moving = stop();
+    const restore = snapshotDay(activeDay);
+    const others = currentStops().filter((item) => item !== moving);
+    trip.days[activeDay].stops = others;
+    const clash = placeTimed(moving, minutes, entry.duration);
+    save(); render();
+    message(`${entry.name} now starts at ${formatTime(minutes)}.${clash ? ` Warning: this time overlaps ${clash}.` : ''}`, restore);
   });
 
   const lengthLabel = el('label', '', 'Time here (minutes)');
@@ -459,7 +522,7 @@ function renderTimeline() {
 
   const rows = items.map((entry, position) => {
     const { spot, venue, name, address, previous } = entry;
-    const item = el('li', highlightId === spot.id ? 'timeline-stop timeline-stop--new' : 'timeline-stop');
+    const item = el('li', `timeline-stop${highlightId === spot.id ? ' timeline-stop--new' : ''}${entry.overlap ? ' timeline-stop--overlap' : ''}`);
     item.dataset.stop = spot.id;
     const time = el('time', 'timeline-stop__time', formatTime(entry.start));
     time.dateTime = `${localDate}T${formatTime(entry.start)}`;
@@ -479,12 +542,6 @@ function renderTimeline() {
     const actions = el('div', 'timeline-stop__actions');
     actions.append(link('Maps ↗', mapsDirections(previous, name, address)));
     actions.append(adjustPanel(entry));
-    // Đổi thứ tự không cần mở form chỉnh sửa. Vẫn dùng cùng logic xếp lịch.
-    const order = el('div', 'timeline-stop__order');
-    order.setAttribute('role', 'group');
-    order.setAttribute('aria-label', `Reorder ${spot.name}`);
-    order.append(...moveButtons(entry, position, items.length));
-    actions.append(order);
     const remove = el('button', 'text-action', 'Remove');
     remove.type = 'button';
     remove.setAttribute('aria-label', `Remove ${spot.name} from day ${activeDay + 1}`);
@@ -495,7 +552,7 @@ function renderTimeline() {
     });
     actions.append(remove);
     body.append(actions);
-    item.append(clock, body);
+    item.append(dragHandle(item, entry), clock, body);
     return item;
   });
   const list = el('ol', 'timeline-list');
@@ -504,10 +561,7 @@ function renderTimeline() {
   highlightId = null;
   // DOM vừa được thay mới: đưa focus về nút/ô vừa thao tác để người dùng bàn phím không bị mất vị trí.
   if (pendingFocus) {
-    const [spotId, key] = pendingFocus.split(':');
-    const target = [...ui.timeline.querySelectorAll('[data-move]')].find((button) => button.dataset.move === pendingFocus && !button.disabled)
-      ?? ui.timeline.querySelector(`[data-move="${spotId}:${key === 'up' ? 'down' : 'up'}"]:not(:disabled)`);
-    target?.focus();
+    [...ui.timeline.querySelectorAll('[data-move]')].find((button) => button.dataset.move === pendingFocus)?.focus();
     pendingFocus = null;
   } else if (focusedEdit) {
     [...ui.timeline.querySelectorAll('[data-stop-edit]')].find((field) => field.dataset.stopEdit === focusedEdit)?.focus({ preventScroll: true });
@@ -739,6 +793,24 @@ ui['place-choice'].addEventListener('change', () => renderPreview('place'));
 ui['custom-time'].addEventListener('input', () => { ui['custom-slot'].disabled = Boolean(ui['custom-time'].value); });
 
 /**
+ * Đặt một điểm có giờ cụ thể vào ngày đang xem (stop chưa nằm trong danh sách ngày): giữ đúng giờ khách chọn,
+ * cập nhật buổi theo giờ đó và chèn đúng vị trí theo giờ. Trả về tên điểm bị chồng giờ (nếu có) để báo cho khách.
+ */
+function placeTimed(stop, start, duration) {
+  const others = scheduleFor(activeDay).items;
+  const clash = others.find((item) => start < item.end && start + duration > item.start);
+  stop.startTime = start;
+  stop.slot = slotForTime(start);
+  trip.days[activeDay].stops = insertStopByTime(currentStops(), stop, others);
+  // Các điểm tự động có thể bị đẩy lùi qua điểm đã ghim giờ: xếp lại cả ngày theo giờ thực tế.
+  trip.days[activeDay].stops = settleOrder(currentStops(), (list) => {
+    trip.days[activeDay].stops = list;
+    return scheduleFor(activeDay).items;
+  });
+  return clash ? `${clash.name} (${formatTime(clash.start)}-${formatTime(clash.end)})` : '';
+}
+
+/**
  * Thêm một điểm dừng vào ngày đang xem. `spot` là món/địa điểm trong catalogue, hoặc null với điểm tự nhập.
  * Điểm có giờ cụ thể được chèn đúng vị trí theo giờ. Trả về true nếu đã thêm.
  */
@@ -754,8 +826,9 @@ function addStop(spot, stop) {
   }
   const other = spot ? dayUsingSpot(trip, spot.id, activeDay) : -1;
   const restore = snapshotDay(activeDay);
+  let clash = '';
   if (Number.isInteger(stop.startTime)) {
-    trip.days[activeDay].stops = insertStopByTime(currentStops(), stop, scheduleFor(activeDay).items);
+    clash = placeTimed(stop, stop.startTime, stop.duration ?? defaultDuration(spot ?? { kind: 'custom' }));
   } else {
     currentStops().push(stop);
   }
@@ -764,7 +837,8 @@ function addStop(spot, stop) {
   const entry = scheduleFor(activeDay).items.find((item) => item.stop.spotId === stop.spotId);
   const when = entry ? ` at ${formatTime(entry.start)}` : '';
   const also = other !== -1 ? ` It is also in day ${other + 1}.` : '';
-  message(`${label} added to day ${activeDay + 1}${when}.${also}`, restore);
+  const overlap = clash ? ` Warning: this time overlaps ${clash}.` : '';
+  message(`${label} added to day ${activeDay + 1}${when}.${overlap}${also}`, restore);
   return true;
 }
 

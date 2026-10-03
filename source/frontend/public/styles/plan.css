@@ -36,7 +36,7 @@ Grid chia cột lớn, Flex sắp nhóm nút; các class khớp với phần t�
 .plan-setup__heading, .plan-workspace__heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .plan-setup__heading h2 { font-size: 19px; }
 #storage-status { color: var(--text-secondary); font-size: 13px; }
-.plan-settings { display: grid; grid-template-columns: 1fr .65fr 1.35fr; gap: 24px; margin-top: 14px; }
+.plan-settings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 14px; }
 .plan-settings label { font-size: 13px; }
 .plan-setup__end { display: flex; align-items: start; gap: 24px; margin-top: 12px; font-size: 13px; }
 #trip-range { color: var(--text-secondary); }
@@ -116,7 +116,7 @@ Grid chia cột lớn, Flex sắp nhóm nút; các class khớp với phần t�
 .day-summary__warnings { margin-top: 14px; font-size: 13px; color: var(--color-error); }
 .timeline-list { display: grid; gap: 0; list-style: none; padding: 0; margin: 16px 0 0; border: 1px solid var(--border-default); background: var(--color-surface); }
 /* Hàng lịch gọn: không đánh số, không tạo khoảng trống lớn giữa các điểm. */
-.timeline-stop { display: grid; grid-template-columns: 68px minmax(0, 1fr); gap: 16px; padding: 12px 16px; list-style: none; }
+.timeline-stop { display: grid; grid-template-columns: 28px 68px minmax(0, 1fr); align-items: start; gap: 16px; padding: 12px 16px; list-style: none; }
 .timeline-stop + .timeline-stop { border-top: 1px solid var(--border-default); }
 .timeline-stop::marker { content: ''; }
 .timeline-stop__clock { border-right: 1px solid var(--border-default); }
@@ -136,22 +136,23 @@ Grid chia cột lớn, Flex sắp nhóm nút; các class khớp với phần t�
 .timeline-stop__fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
 .timeline-stop__adjust label { font-size: 13px; }
 .timeline-stop__wide { grid-column: 1 / -1; }
-.timeline-stop__order { display: flex; gap: 4px; margin-left: auto; }
-.timeline-stop__move { width: 44px; height: 44px; border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: var(--color-surface); font-size: 20px; cursor: pointer; }
-.timeline-stop__move:hover:not(:disabled) { border-color: var(--accent-action); color: var(--accent-action); background: var(--bg-sunken); }
+.timeline-stop__drag { width: 28px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--text-secondary); font-size: 22px; line-height: 1; cursor: grab; touch-action: none; }
+.timeline-stop__drag:hover, .timeline-stop__drag:focus-visible { color: var(--accent-action); }
+.timeline-stop--dragging { opacity: .45; }
+.timeline-stop--drop-before { box-shadow: 0 -3px 0 var(--accent-action); }
+.timeline-stop--drop-after { box-shadow: 0 3px 0 var(--accent-action); }
 .timeline-stop__fields > .text-action { grid-column: 1 / -1; justify-self: start; }
+.timeline-stop--overlap { background: color-mix(in srgb, var(--color-error) 10%, var(--color-surface)); box-shadow: inset 4px 0 0 var(--color-error); }
+.timeline-stop--overlap .timeline-stop__time { color: var(--color-error); }
 .timeline-stop--new { outline: 2px solid var(--border-default); outline-offset: 5px; }
 .plan-empty { padding: 34px 0; }
 .plan-empty h4 { font-size: 25px; margin-bottom: 10px; }
 .plan-empty p { color: var(--text-secondary); font-size: 14px; max-width: 40ch; }
 .plan-empty__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-.plan-help { margin-top: 20px; font-size: 13px; color: var(--text-secondary); }
-.plan-help summary { min-height: 36px; }
-.plan-help p + p { margin-top: 10px; }
 .plan-share-fallback { margin-top: 16px; font-size: 14px; }
 
 /* Lưu và xuất lịch là chức năng phụ, tách khỏi luồng thêm điểm. */
-.plan-library { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-default); scroll-margin-top: 95px; }
+.plan-library { margin-top: 14px; padding-top: 6px; border-top: 1px solid var(--border-default); scroll-margin-top: 95px; }
 .plan-library > summary { min-height: 44px; color: var(--accent-action); }
 .plan-library__grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 36px; margin-top: 18px; }
 .plan-library__form { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
@@ -160,7 +161,7 @@ Grid chia cột lớn, Flex sắp nhóm nút; các class khớp với phần t�
 .plan-library__item > div { flex: 1; }
 .plan-library__item p { font-size: 13px; color: var(--text-secondary); }
 .plan-status:empty { display: none; }
-.plan-status { position: fixed; z-index: 30; bottom: 16px; right: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; width: min(460px, calc(100vw - 40px)); padding: 12px 18px; border: 1px solid var(--border-default); background: var(--color-surface); box-shadow: var(--shadow-raised); font-size: 14px; }
+.plan-status { position: fixed; z-index: 30; top: 108px; right: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; width: min(460px, calc(100vw - 40px)); padding: 12px 18px; border: 1px solid var(--border-default); background: var(--color-surface); box-shadow: var(--shadow-raised); font-size: 14px; }
 .plan-status > span { flex: 1 1 100%; }
 .plan-status > span { min-width: 0; }
 .plan-status button { flex: none; white-space: nowrap; }

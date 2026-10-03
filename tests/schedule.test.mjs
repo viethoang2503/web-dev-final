@@ -5,7 +5,7 @@
  */
 /** Unit tests cho logic xếp lịch. Không cần server hay trình duyệt. */
 import assert from 'node:assert/strict';
-import { DAY_END, MAX_STOPS_PER_DAY, insertStopByTime, moveStop, slotForTime, openingWarning, optimizeOrder, scheduleDay, suggestNearby, travelMinutes } from '../source/frontend/public/scripts/shared/schedule.js';
+import { DAY_END, MAX_STOPS_PER_DAY, insertStopByTime, moveStop, settleOrder, moveStopTo, slotForTime, openingWarning, optimizeOrder, scheduleDay, suggestNearby, travelMinutes } from '../source/frontend/public/scripts/shared/schedule.js';
 import { MAX_DAYS, TOURS, isValidStop, mapsDirections, placeText, addDays, dayUsingSpot, daysBetween, ensureDays, mapsRoute, normalizeTrip, pruneTrip } from '../source/frontend/public/scripts/shared/guide.js';
 import { buildIcs, escapeIcsText, foldLine, icsLocalTime } from '../source/frontend/public/scripts/shared/calendar.js';
 import { buildTourStops } from '../source/frontend/public/scripts/shared/tours.js';
@@ -489,6 +489,45 @@ test('insertStopByTime puts a timed stop before the first later stop', () => {
   const late = insertStopByTime(stops, dish({ slot: 'evening', startTime: 20 * 60 }), items);
   assert.deepEqual(late.map((stop) => stop.spotId), ['lake', 'citadel', 'custom-1']);
   assert.equal(stops.length, 2);
+});
+
+test('a pinned start before the previous stop ends reports an overlap', () => {
+  const { items } = run([
+    { kind: 'place', spotId: 'lake', slot: 'morning' },
+    { kind: 'place', spotId: 'citadel', slot: 'morning', startTime: 9 * 60 },
+  ]);
+  assert.ok(items[1].warnings.some((text) => text.startsWith('Overlaps')));
+  assert.equal(items[0].overlap, true);
+  assert.equal(items[1].overlap, true);
+});
+
+test('moveStopTo drops a stop before or after another and adopts its slot', () => {
+  const stops = [
+    { kind: 'place', spotId: 'lake', slot: 'morning' },
+    { kind: 'place', spotId: 'citadel', slot: 'morning' },
+    { kind: 'place', spotId: 'long', slot: 'afternoon' },
+  ];
+  assert.deepEqual(moveStopTo(stops, 2, 0).map((stop) => stop.spotId), ['long', 'lake', 'citadel']);
+  assert.equal(moveStopTo(stops, 2, 0)[0].slot, 'morning');
+  assert.deepEqual(moveStopTo(stops, 0, 1, true).map((stop) => stop.spotId), ['citadel', 'lake', 'long']);
+  assert.deepEqual(moveStopTo(stops, 0, 2, true).map((stop) => stop.spotId), ['citadel', 'long', 'lake']);
+  assert.equal(moveStopTo(stops, 0, 1, false), stops);
+  assert.equal(moveStopTo(stops, 1, 0, true), stops);
+  assert.equal(stops[2].slot, 'afternoon');
+});
+
+test('settleOrder puts auto stops pushed past a pinned stop after it', () => {
+  const stops = [
+    { kind: 'place', spotId: 'lake', slot: 'morning' },
+    { kind: 'place', spotId: 'citadel', slot: 'morning', startTime: 9 * 60 + 30, duration: 30 },
+    { kind: 'place', spotId: 'long', slot: 'morning' },
+  ];
+  // lake 08:00-09:30, citadel ghim 09:30, long tự động bị đẩy tới sau citadel nên thứ tự đã đúng
+  assert.deepEqual(settleOrder(stops, (list) => run(list).items).map((stop) => stop.spotId), ['lake', 'citadel', 'long']);
+  const swapped = [stops[0], stops[2], { ...stops[1], startTime: 8 * 60 + 30 }];
+  const settled = settleOrder(swapped, (list) => run(list).items);
+  const starts = run(settled).items.map((item) => item.start);
+  assert.deepEqual(starts, [...starts].sort((a, b) => a - b));
 });
 
 test('maps text and calendar location skip a missing address', () => {

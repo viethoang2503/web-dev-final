@@ -90,10 +90,10 @@ await withPage(base + '/plan.html?food=food-pho-bo', desktop, async (page) => {
 });
 
 await withPage(base + '/plan.html?tour=old-quarter', { ...desktop, width: 1024, height: 768 }, async (page) => {
-  check('Reorder controls are visible without opening Edit stop', await page.evaluate('[...document.querySelectorAll("[data-move]")].every(button => button.getClientRects().length && !button.closest("details"))'));
+  check('Drag handles are visible without opening Edit stop', await page.evaluate('[...document.querySelectorAll("[data-move]")].every(button => button.getClientRects().length && !button.closest("details"))'));
   check('Every stop displays a departure time', await page.evaluate('document.querySelectorAll(".timeline-stop__end").length === document.querySelectorAll(".timeline-stop").length'));
   const beforeMove = await page.evaluate(`${trip}.days[0].stops`);
-  await page.click('.timeline-stop:first-child [data-move$=":down"]');
+  await page.evaluate('document.querySelector(".timeline-stop:first-child [data-move]").dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }))');
   await page.click('#plan-status button');
   check('Undo restores the original order after moving a stop', JSON.stringify(await page.evaluate(`${trip}.days[0].stops`)) === JSON.stringify(beforeMove));
   await page.click('.timeline-stop__adjust > summary');
